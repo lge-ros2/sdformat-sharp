@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>SdFormat</RootNamespace>
+    <AssemblyName>SdFormat</AssemblyName>
+    <Version>15.0.0</Version>
+    <Authors>Open Source Robotics Foundation</Authors>
+    <Description>C# port of libsdformat - SDF (Simulation Description Format) parser and DOM library</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gazebosim/sdformat</PackageProjectUrl>
+    <LangVersion>12.0</LangVersion>
+  </PropertyGroup>
+
+</Project>

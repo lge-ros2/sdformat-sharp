@@ -1,0 +1,1 @@
+../../src/SdFormat/Plugin.cs

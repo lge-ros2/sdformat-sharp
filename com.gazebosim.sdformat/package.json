@@ -1,0 +1,38 @@
+{
+  "name": "com.gazebosim.sdformat",
+  "version": "16.0.1",
+  "displayName": "SdFormat",
+  "description": "C# SDF (Simulation Description Format) parser and DOM library. Parse, inspect, modify, and build SDF robot/world descriptions entirely in C# — no native dependencies required.",
+  "unity": "2022.3",
+  "unityRelease": "0f1",
+  "documentationUrl": "https://github.com/gazebosim/sdformat",
+  "changelogUrl": "https://github.com/gazebosim/sdformat/blob/main/Changelog.md",
+  "licensesUrl": "https://github.com/gazebosim/sdformat/blob/main/LICENSE",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sdf",
+    "sdformat",
+    "gazebo",
+    "robotics",
+    "simulation",
+    "urdf",
+    "ros",
+    "parser"
+  ],
+  "author": {
+    "name": "Open Source Robotics Foundation",
+    "url": "https://www.openrobotics.org"
+  },
+  "samples": [
+    {
+      "displayName": "Parse World",
+      "description": "Load an SDF world file, iterate over models/links/joints/sensors and print the structure.",
+      "path": "Samples~/ParseWorld"
+    },
+    {
+      "displayName": "Build Model",
+      "description": "Construct a differential-drive robot model entirely from code, then serialize to SDF XML.",
+      "path": "Samples~/BuildModel"
+    }
+  ]
+}

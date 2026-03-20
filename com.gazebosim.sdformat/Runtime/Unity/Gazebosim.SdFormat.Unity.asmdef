@@ -1,0 +1,16 @@
+{
+    "name": "Gazebosim.SdFormat.Unity",
+    "rootNamespace": "SdFormat.Unity",
+    "references": [
+        "Gazebosim.SdFormat"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
