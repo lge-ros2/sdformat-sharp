@@ -62,7 +62,7 @@ namespace SdFormat.Math
             double sinp = 2.0 * (W * Y - Z * X);
             double pitch;
             if (System.Math.Abs(sinp) >= 1)
-                pitch = System.Math.CopySign(System.Math.PI / 2, sinp);
+                pitch = (sinp >= 0 ? 1.0 : -1.0) * (System.Math.PI / 2);
             else
                 pitch = System.Math.Asin(sinp);
 
