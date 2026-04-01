@@ -1,1 +1,1 @@
-../../com.gazebosim.sdformat/Runtime/SemanticPose.cs
+../../com.lge-ros2.sdformat/Runtime/SemanticPose.cs

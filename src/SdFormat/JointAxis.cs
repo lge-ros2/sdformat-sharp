@@ -1,1 +1,1 @@
-../../com.gazebosim.sdformat/Runtime/JointAxis.cs
+../../com.lge-ros2.sdformat/Runtime/JointAxis.cs

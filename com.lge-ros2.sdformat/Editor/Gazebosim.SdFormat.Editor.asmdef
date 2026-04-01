@@ -1,10 +1,12 @@
 {
-    "name": "Gazebosim.SdFormat.Unity",
-    "rootNamespace": "SdFormat.Unity",
+    "name": "lge-ros2.SdFormat.Editor",
+    "rootNamespace": "SdFormat.Editor",
     "references": [
-        "Gazebosim.SdFormat"
+        "lge-ros2.SdFormat"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

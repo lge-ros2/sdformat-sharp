@@ -1,6 +1,6 @@
 # Changelog
 
-## [15.0.0] — 2025-01-01
+## [16.0.1] — 2026-04-01
 
 ### Added
 - Initial Unity package release.

@@ -1,1 +1,1 @@
-../../com.gazebosim.sdformat/Runtime/Config.cs
+../../com.lge-ros2.sdformat/Runtime/Config.cs

@@ -1,5 +1,5 @@
 {
-    "name": "Gazebosim.SdFormat",
+    "name": "lge-ros2.SdFormat",
     "rootNamespace": "SdFormat",
     "references": [],
     "includePlatforms": [],

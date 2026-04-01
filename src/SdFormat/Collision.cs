@@ -1,1 +1,1 @@
-../../com.gazebosim.sdformat/Runtime/Collision.cs
+../../com.lge-ros2.sdformat/Runtime/Collision.cs

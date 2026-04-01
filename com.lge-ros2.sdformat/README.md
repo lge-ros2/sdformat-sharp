@@ -24,12 +24,12 @@ Parse, inspect, modify, and build SDF robot / world descriptions — no native p
 
 ### Option A — Local folder (recommended for development)
 
-1. Copy or symlink the `com.gazebosim.sdformat` folder into your project's `Packages/` directory:
+1. Copy or symlink the `com.lge-ros2.sdformat` folder into your project's `Packages/` directory:
 
 ```
 YourUnityProject/
   Packages/
-    com.gazebosim.sdformat/   ← this folder
+    com.lge-ros2.sdformat/   ← this folder
 ```
 
 2. Unity will detect it automatically.
@@ -39,14 +39,14 @@ YourUnityProject/
 In Unity, go to **Window → Package Manager → + → Add package from git URL…** and enter:
 
 ```
-https://github.com/lge-ros2/sdformat-sharp.git?path=com.gazebosim.sdformat
+https://github.com/lge-ros2/sdformat-sharp.git?path=com.lge-ros2.sdformat
 ```
 
 ### Option C — Tarball
 
 ```bash
-cd com.gazebosim.sdformat
-npm pack          # produces com.gazebosim.sdformat-15.0.0.tgz
+cd com.lge-ros2.sdformat
+npm pack          # produces com.lge-ros2.sdformat-15.0.0.tgz
 ```
 
 Then **Window → Package Manager → + → Add package from tarball…**
@@ -113,9 +113,9 @@ Pose3d back = transform.ToPose3d();
 
 | Assembly | Description |
 |---|---|
-| `Gazebosim.SdFormat` | Core parser & DOM — no Unity dependency, `noEngineReferences: true` |
-| `Gazebosim.SdFormat.Unity` | Bridge, spawner — references `UnityEngine` |
-| `Gazebosim.SdFormat.Editor` | `.sdf` importer — Editor-only |
+| `lge-ros2.SdFormat` | Core parser & DOM — no Unity dependency, `noEngineReferences: true` |
+| `lge-ros2.SdFormat.Unity` | Bridge, spawner — references `UnityEngine` |
+| `lge-ros2.SdFormat.Editor` | `.sdf` importer — Editor-only |
 
 ## Samples
 

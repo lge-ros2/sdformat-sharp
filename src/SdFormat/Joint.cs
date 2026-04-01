@@ -1,1 +1,1 @@
-../../com.gazebosim.sdformat/Runtime/Joint.cs
+../../com.lge-ros2.sdformat/Runtime/Joint.cs

@@ -4,7 +4,7 @@ Copyright 2025-2026 LGE-ROS2
 This software is a C# port of libsdformat (SDFormat),
 originally developed by the Open Source Robotics Foundation (OSRF).
 
-Original project: https://github.com/gazebosim/sdformat
+Original project: https://github.com/lge-ros2/sdformat
 Original license: Apache License 2.0
 Original copyright: Copyright (C) 2012-2024 Open Source Robotics Foundation
 
