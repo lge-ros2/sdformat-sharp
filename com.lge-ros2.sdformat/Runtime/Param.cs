@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Param.hh
 
+#nullable enable
+
 using System;
 using System.Globalization;
 using SdFormat.Math;

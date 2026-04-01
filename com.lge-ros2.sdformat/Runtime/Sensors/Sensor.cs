@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Sensor.hh + sensor sub-types
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using SdFormat.Math;

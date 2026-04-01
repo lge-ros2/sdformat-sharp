@@ -3,6 +3,8 @@
 // SDF XML parser — converts XML text to Element tree.
 // Uses System.Xml.Linq (built into .NET) instead of tinyxml2.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;

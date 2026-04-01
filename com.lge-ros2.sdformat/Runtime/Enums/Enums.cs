@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Material.hh, Noise.hh, Atmosphere.hh, Pbr.hh, ParserConfig.hh
 
+#nullable enable
+
 namespace SdFormat
 {
     /// <summary>Shader type for materials.</summary>

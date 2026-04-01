@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - ParserConfig.hh, OutputConfig.hh, PrintConfig.hh
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 

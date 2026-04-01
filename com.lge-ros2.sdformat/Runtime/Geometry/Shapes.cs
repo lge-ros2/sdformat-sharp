@@ -3,6 +3,8 @@
 // Ported from libsdformat (C++) - Box.hh, Sphere.hh, Cylinder.hh, Capsule.hh,
 // Cone.hh, Ellipsoid.hh, Plane.hh, Mesh.hh, Heightmap.hh, Polyline.hh
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using SdFormat.Math;

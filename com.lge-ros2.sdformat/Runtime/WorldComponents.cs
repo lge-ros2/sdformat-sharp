@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Atmosphere.hh, Scene.hh, Gui.hh, Physics.hh, Actor.hh
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
 using SdFormat.Math;

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Light.hh
 
+#nullable enable
+
 using System.Collections.Generic;
 using SdFormat.Math;
 

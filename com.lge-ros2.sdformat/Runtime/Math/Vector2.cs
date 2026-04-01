@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Lightweight math types to replace gz::math dependencies
 
+#nullable enable
+
 using System;
 
 namespace SdFormat.Math

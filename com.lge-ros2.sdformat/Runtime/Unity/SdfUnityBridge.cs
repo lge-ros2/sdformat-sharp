@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Open Source Robotics Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+#nullable enable
+
 using UnityEngine;
 using SdFormat.Math;
 

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Ported from libsdformat (C++) - Error.hh
 
+#nullable enable
+
 using System.Text;
 
 namespace SdFormat

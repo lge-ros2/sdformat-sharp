@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Open Source Robotics Foundation
 // SPDX-License-Identifier: Apache-2.0
 
+#nullable enable
+
 using UnityEngine;
 
 namespace SdFormat.Unity
@@ -17,7 +19,7 @@ namespace SdFormat.Unity
         /// Spawn an entire SDF Root into the scene under a parent transform.
         /// If parent is null, spawns at scene root.
         /// </summary>
-        public static GameObject Spawn(Root root, Transform parent = null)
+        public static GameObject Spawn(Root root, Transform? parent = null)
         {
             var go = new GameObject($"SDF [{root.Version}]");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -41,7 +43,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn a world and its contents.</summary>
-        public static GameObject SpawnWorld(World world, Transform parent = null)
+        public static GameObject SpawnWorld(World world, Transform? parent = null)
         {
             var go = new GameObject($"World:{world.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -64,7 +66,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn a model as a hierarchy of link GameObjects.</summary>
-        public static GameObject SpawnModel(Model model, Transform parent = null)
+        public static GameObject SpawnModel(Model model, Transform? parent = null)
         {
             var go = new GameObject($"Model:{model.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -91,7 +93,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn a link with its visuals and colliders.</summary>
-        public static GameObject SpawnLink(Link link, Transform parent = null)
+        public static GameObject SpawnLink(Link link, Transform? parent = null)
         {
             var go = new GameObject($"Link:{link.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -124,7 +126,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn a visual geometry as a MeshRenderer.</summary>
-        public static GameObject SpawnVisual(Visual visual, Transform parent = null)
+        public static GameObject SpawnVisual(Visual visual, Transform? parent = null)
         {
             var go = CreateGeometryObject($"Visual:{visual.Name}", visual.Geom);
             if (go == null)
@@ -151,7 +153,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn a collision geometry as a Collider.</summary>
-        public static GameObject SpawnCollision(Collision collision, Transform parent = null)
+        public static GameObject SpawnCollision(Collision collision, Transform? parent = null)
         {
             var go = new GameObject($"Collision:{collision.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -198,7 +200,7 @@ namespace SdFormat.Unity
         }
 
         /// <summary>Spawn an SDF Light as a Unity Light component.</summary>
-        public static GameObject SpawnLight(Light sdfLight, Transform parent = null)
+        public static GameObject SpawnLight(Light sdfLight, Transform? parent = null)
         {
             var go = new GameObject($"Light:{sdfLight.Name}");
             if (parent != null) go.transform.SetParent(parent, false);
@@ -223,8 +225,8 @@ namespace SdFormat.Unity
                 case LightType.Spot:
                     light.type = UnityEngine.LightType.Spot;
                     light.range = (float)sdfLight.AttenuationRange;
-                    light.spotAngle = (float)(sdfLight.SpotOuterAngle * 180.0 / System.Math.PI);
-                    light.innerSpotAngle = (float)(sdfLight.SpotInnerAngle * 180.0 / System.Math.PI);
+                    light.spotAngle = (float)sdfLight.SpotOuterAngle.Degrees;
+                    light.innerSpotAngle = (float)sdfLight.SpotInnerAngle.Degrees;
                     break;
             }
 
@@ -233,7 +235,7 @@ namespace SdFormat.Unity
 
         // ──────────────── Geometry → Primitive ────────────────
 
-        private static GameObject CreateGeometryObject(string name, Geometry geom)
+        private static GameObject? CreateGeometryObject(string name, Geometry geom)
         {
             switch (geom.Type)
             {
