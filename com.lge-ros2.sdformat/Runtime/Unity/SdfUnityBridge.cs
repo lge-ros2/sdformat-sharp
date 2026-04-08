@@ -4,12 +4,12 @@
 #nullable enable
 
 using UnityEngine;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat.Unity
+namespace SDFormat.Unity
 {
     /// <summary>
-    /// Extension methods that convert SdFormat math types to Unity math types
+    /// Extension methods that convert SDFormat math types to Unity math types
     /// and vice versa, handling coordinate system differences.
     ///
     /// SDF uses a right-handed Z-up coordinate system.
@@ -80,21 +80,21 @@ namespace SdFormat.Unity
         // ──────────────────────── Colors ────────────────────────
 
         /// <summary>Convert SDF Color → Unity Color.</summary>
-        public static UnityEngine.Color ToUnity(this SdFormat.Math.Color c)
+        public static UnityEngine.Color ToUnity(this SDFormat.Math.Color c)
             => new UnityEngine.Color(c.R, c.G, c.B, c.A);
 
         /// <summary>Convert Unity Color → SDF Color.</summary>
-        public static SdFormat.Math.Color ToSdf(this UnityEngine.Color c)
-            => new SdFormat.Math.Color(c.r, c.g, c.b, c.a);
+        public static SDFormat.Math.Color ToSdf(this UnityEngine.Color c)
+            => new SDFormat.Math.Color(c.r, c.g, c.b, c.a);
 
         // ──────────────────────── Vector2 ────────────────────────
 
         /// <summary>Convert SDF Vector2d → Unity Vector2.</summary>
-        public static Vector2 ToUnity(this SdFormat.Math.Vector2d v)
+        public static Vector2 ToUnity(this SDFormat.Math.Vector2d v)
             => new Vector2((float)v.X, (float)v.Y);
 
         /// <summary>Convert Unity Vector2 → SDF Vector2d.</summary>
-        public static SdFormat.Math.Vector2d ToSdf(this Vector2 v)
-            => new SdFormat.Math.Vector2d(v.x, v.y);
+        public static SDFormat.Math.Vector2d ToSdf(this Vector2 v)
+            => new SDFormat.Math.Vector2d(v.x, v.y);
     }
 }

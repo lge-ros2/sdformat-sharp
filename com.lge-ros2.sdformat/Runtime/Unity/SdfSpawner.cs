@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-namespace SdFormat.Unity
+namespace SDFormat.Unity
 {
     /// <summary>
     /// Spawns a Unity GameObject hierarchy from a parsed SDF <see cref="Root"/>.
@@ -192,7 +192,7 @@ namespace SdFormat.Unity
                     break;
 
                 case GeometryType.Mesh when geom.MeshShape != null:
-                    Debug.Log($"[SdFormat] Mesh collider URI: {geom.MeshShape.Uri} — add MeshCollider manually.");
+                    Debug.Log($"[SDFormat] Mesh collider URI: {geom.MeshShape.Uri} — add MeshCollider manually.");
                     break;
             }
 
@@ -279,7 +279,7 @@ namespace SdFormat.Unity
                     return plane;
 
                 case GeometryType.Mesh when geom.MeshShape != null:
-                    Debug.Log($"[SdFormat] Visual mesh URI: {geom.MeshShape.Uri} — assign mesh manually.");
+                    Debug.Log($"[SDFormat] Visual mesh URI: {geom.MeshShape.Uri} — assign mesh manually.");
                     return null;
 
                 default:

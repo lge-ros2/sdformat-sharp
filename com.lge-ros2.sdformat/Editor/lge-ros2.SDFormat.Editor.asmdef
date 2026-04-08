@@ -1,8 +1,8 @@
 {
-    "name": "lge-ros2.SdFormat.Editor",
-    "rootNamespace": "SdFormat.Editor",
+    "name": "lge-ros2.SDFormat.Editor",
+    "rootNamespace": "SDFormat.Editor",
     "references": [
-        "lge-ros2.SdFormat"
+        "lge-ros2.SDFormat"
     ],
     "includePlatforms": [
         "Editor"

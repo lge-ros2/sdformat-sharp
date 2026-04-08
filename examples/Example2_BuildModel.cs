@@ -5,8 +5,8 @@
 //   - Setting poses, inertial properties, geometry shapes
 //   - Serializing the result to XML via ToElement()
 
-using SdFormat;
-using SdFormat.Math;
+using SDFormat;
+using SDFormat.Math;
 
 namespace Examples;
 

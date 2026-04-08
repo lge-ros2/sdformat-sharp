@@ -6,9 +6,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// A link contains the physical properties of a body within a model,

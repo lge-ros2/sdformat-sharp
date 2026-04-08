@@ -6,9 +6,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Description of a joint connecting two links within a model.

@@ -1,7 +1,7 @@
 {
   "name": "com.lge-ros2.sdformat",
   "version": "16.0.1",
-  "displayName": "SdFormat",
+  "displayName": "SDFormat",
   "description": "C# SDF (Simulation Description Format) parser and DOM library. Parse, inspect, modify, and build SDF robot/world descriptions entirely in C# — no native dependencies required.",
   "unity": "2022.3",
   "unityRelease": "0f1",

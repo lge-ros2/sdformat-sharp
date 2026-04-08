@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-namespace SdFormat.Editor
+namespace SDFormat.Editor
 {
     /// <summary>
     /// ScriptedImporter that recognizes .sdf files in the Unity project

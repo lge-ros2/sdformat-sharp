@@ -1,15 +1,15 @@
-// SdFormat Unity Sample — Build a robot model purely from code.
+// SDFormat Unity Sample — Build a robot model purely from code.
 //
 // Usage:
 //   1. Attach this MonoBehaviour to any GameObject.
 //   2. Press Play — a differential-drive robot will be spawned.
 
 using UnityEngine;
-using SdFormat;
-using SdFormat.Math;
-using SdFormat.Unity;
+using SDFormat;
+using SDFormat.Math;
+using SDFormat.Unity;
 
-namespace SdFormat.Samples
+namespace SDFormat.Samples
 {
     public class BuildModelSample : MonoBehaviour
     {
@@ -32,7 +32,7 @@ namespace SdFormat.Samples
             };
             chassisVis.MaterialInfo = new Material
             {
-                Diffuse = new SdFormat.Math.Color(0.2f, 0.2f, 0.9f)
+                Diffuse = new SDFormat.Math.Color(0.2f, 0.2f, 0.9f)
             };
             chassis.AddVisual(chassisVis);
 

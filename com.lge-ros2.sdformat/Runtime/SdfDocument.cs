@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// The SDF (Simulation Description Format) document class.

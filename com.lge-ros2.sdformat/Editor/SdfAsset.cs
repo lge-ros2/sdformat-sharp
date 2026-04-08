@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace SdFormat.Editor
+namespace SDFormat.Editor
 {
     /// <summary>
     /// ScriptableObject that stores metadata about an imported .sdf file.

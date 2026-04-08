@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SdFormat.Math
+namespace SDFormat.Math
 {
     /// <summary>
     /// A quaternion for 3D rotations. Replaces gz::math::Quaterniond.

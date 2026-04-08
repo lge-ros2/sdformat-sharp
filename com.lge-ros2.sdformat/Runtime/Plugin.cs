@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// An SDF plugin element, identified by name and filename.

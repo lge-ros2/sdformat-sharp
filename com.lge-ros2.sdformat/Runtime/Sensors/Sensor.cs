@@ -6,9 +6,9 @@
 
 using System;
 using System.Collections.Generic;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     // ---- Sensor sub-type classes ----
 

@@ -5,9 +5,9 @@
 #nullable enable
 
 using System.Collections.Generic;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>Contact properties of a surface.</summary>
     public class Contact

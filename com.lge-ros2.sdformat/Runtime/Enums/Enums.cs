@@ -4,7 +4,7 @@
 
 #nullable enable
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>Shader type for materials.</summary>
     public enum ShaderType

@@ -6,8 +6,8 @@
 //   - Modifying joint limits, link masses, adding frames
 //   - Serializing the modified model back to XML
 
-using SdFormat;
-using SdFormat.Math;
+using SDFormat;
+using SDFormat.Math;
 
 namespace Examples;
 

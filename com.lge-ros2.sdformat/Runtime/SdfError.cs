@@ -6,7 +6,7 @@
 
 using System.Text;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Defines a single SDF error with an error code, message, and optional

@@ -5,9 +5,9 @@
 #nullable enable
 
 using System.Collections.Generic;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// SemanticPose allows resolving poses relative to other frames in

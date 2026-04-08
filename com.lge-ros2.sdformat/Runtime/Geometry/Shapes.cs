@@ -7,9 +7,9 @@
 
 using System;
 using System.Collections.Generic;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>Box geometry defined by its three dimensions.</summary>
     public class Box

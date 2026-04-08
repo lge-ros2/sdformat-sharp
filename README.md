@@ -1,4 +1,4 @@
-# SdFormat-Sharp
+# SDFormat-Sharp
 
 A pure C# port of [libsdformat](https://github.com/gazebosim/sdformat) — the
 **SDF (Simulation Description Format)** parser and DOM library used by
@@ -21,7 +21,7 @@ A pure C# port of [libsdformat](https://github.com/gazebosim/sdformat) — the
 ## Quick Start
 
 ```csharp
-using SdFormat;
+using SDFormat;
 
 // Load an SDF file
 var root = new Root();
@@ -68,7 +68,7 @@ Console.WriteLine($"  Box size: {model.Links[0].Visuals[0].Geom.BoxShape!.Size}"
 ## Project Structure
 
 ```
-src/SdFormat/
+src/SDFormat/
 ├── Enums/           # ErrorCode, JointType, GeometryType, SensorType, LightType, ...
 ├── Math/            # Vector2d, Vector3d, Quaterniond, Pose3d, Color, Angle, Inertial, ...
 ├── Geometry/        # Box, Sphere, Cylinder, Capsule, Cone, Ellipsoid, Plane, Mesh, ...
@@ -105,28 +105,28 @@ dotnet build
 
 ## Mapping from C++ to C#
 
-| C++ (libsdformat) | C# (SdFormat-Sharp) |
+| C++ (libsdformat) | C# (SDFormat-Sharp) |
 |---|---|
-| `sdf::Root` | `SdFormat.Root` |
-| `sdf::World` | `SdFormat.World` |
-| `sdf::Model` | `SdFormat.Model` |
-| `sdf::Link` | `SdFormat.Link` |
-| `sdf::Joint` | `SdFormat.Joint` |
-| `sdf::Visual` | `SdFormat.Visual` |
-| `sdf::Collision` | `SdFormat.Collision` |
-| `sdf::Sensor` | `SdFormat.Sensor` |
-| `sdf::Light` | `SdFormat.Light` |
-| `sdf::Geometry` | `SdFormat.Geometry` |
-| `sdf::Element` | `SdFormat.Element` |
-| `sdf::Param` | `SdFormat.Param` |
-| `sdf::Error` | `SdFormat.SdfError` |
-| `sdf::SDF` | `SdFormat.SdfDocument` |
+| `sdf::Root` | `SDFormat.Root` |
+| `sdf::World` | `SDFormat.World` |
+| `sdf::Model` | `SDFormat.Model` |
+| `sdf::Link` | `SDFormat.Link` |
+| `sdf::Joint` | `SDFormat.Joint` |
+| `sdf::Visual` | `SDFormat.Visual` |
+| `sdf::Collision` | `SDFormat.Collision` |
+| `sdf::Sensor` | `SDFormat.Sensor` |
+| `sdf::Light` | `SDFormat.Light` |
+| `sdf::Geometry` | `SDFormat.Geometry` |
+| `sdf::Element` | `SDFormat.Element` |
+| `sdf::Param` | `SDFormat.Param` |
+| `sdf::Error` | `SDFormat.SdfError` |
+| `sdf::SDF` | `SDFormat.SdfDocument` |
 | `std::vector<sdf::Error>` | `List<SdfError>` |
 | `sdf::ElementPtr` | `Element?` |
-| `gz::math::Vector3d` | `SdFormat.Math.Vector3d` |
-| `gz::math::Pose3d` | `SdFormat.Math.Pose3d` |
-| `gz::math::Quaterniond` | `SdFormat.Math.Quaterniond` |
-| `gz::math::Color` | `SdFormat.Math.Color` |
+| `gz::math::Vector3d` | `SDFormat.Math.Vector3d` |
+| `gz::math::Pose3d` | `SDFormat.Math.Pose3d` |
+| `gz::math::Quaterniond` | `SDFormat.Math.Quaterniond` |
+| `gz::math::Color` | `SDFormat.Math.Color` |
 
 ## License
 

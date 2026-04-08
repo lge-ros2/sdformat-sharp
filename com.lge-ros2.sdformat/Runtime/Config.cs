@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Configuration options for the SDF parser.

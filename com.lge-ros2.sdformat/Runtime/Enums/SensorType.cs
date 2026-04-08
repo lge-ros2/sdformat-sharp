@@ -4,7 +4,7 @@
 
 #nullable enable
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// The set of sensor types.

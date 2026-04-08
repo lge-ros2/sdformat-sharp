@@ -6,7 +6,7 @@
 
 using System;
 
-namespace SdFormat.Math
+namespace SDFormat.Math
 {
     /// <summary>
     /// A 2D vector with double components.

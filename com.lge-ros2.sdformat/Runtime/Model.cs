@@ -6,9 +6,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// A model describes a complete robot or object, consisting of links

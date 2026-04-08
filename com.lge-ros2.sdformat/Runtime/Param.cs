@@ -6,9 +6,9 @@
 
 using System;
 using System.Globalization;
-using SdFormat.Math;
+using SDFormat.Math;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// A parameter consisting of a key, type, default value, required flag,

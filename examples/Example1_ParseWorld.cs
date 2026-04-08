@@ -5,7 +5,7 @@
 //   - Iterating over worlds, models, links, joints
 //   - Accessing geometry and sensor information
 
-using SdFormat;
+using SDFormat;
 
 namespace Examples;
 

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Root of an SDF document. This is the top-level entry point that contains

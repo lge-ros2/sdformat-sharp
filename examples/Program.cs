@@ -1,10 +1,10 @@
-﻿// SdFormat-Sharp Examples
+﻿// SDFormat-Sharp Examples
 // Run all examples or pick one by number
 
 using Examples;
 
 Console.WriteLine("╔═══════════════════════════════════════════════╗");
-Console.WriteLine("║         SdFormat-Sharp Examples               ║");
+Console.WriteLine("║         SDFormat-Sharp Examples               ║");
 Console.WriteLine("╠═══════════════════════════════════════════════╣");
 Console.WriteLine("║  1. Parse World   – Load & print world.sdf   ║");
 Console.WriteLine("║  2. Build Model   – Create model from code   ║");

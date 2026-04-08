@@ -11,7 +11,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Parses SDF XML text or files into an Element tree.
@@ -86,7 +86,7 @@ namespace SdFormat
         }
 
         /// <summary>
-        /// Convert an XElement (System.Xml.Linq) into an SdFormat.Element recursively.
+        /// Convert an XElement (System.Xml.Linq) into an SDFormat.Element recursively.
         /// </summary>
         private Element ConvertXElement(XElement xElem, List<SdfError> errors)
         {

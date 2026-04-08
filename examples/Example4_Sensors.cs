@@ -6,8 +6,8 @@
 //   - Attaching sensors to links and printing their configurations
 //   - Serializing the result
 
-using SdFormat;
-using SdFormat.Math;
+using SDFormat;
+using SDFormat.Math;
 
 namespace Examples;
 

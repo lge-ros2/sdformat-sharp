@@ -4,7 +4,7 @@
 
 #nullable enable
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// The set of joint types. Used by the Joint class to define the type of joint.

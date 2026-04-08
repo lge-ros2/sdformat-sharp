@@ -1,7 +1,9 @@
 {
-    "name": "lge-ros2.SdFormat",
-    "rootNamespace": "SdFormat",
-    "references": [],
+    "name": "lge-ros2.SDFormat.Unity",
+    "rootNamespace": "SDFormat.Unity",
+    "references": [
+        "lge-ros2.SDFormat"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -10,5 +12,5 @@
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": true
+    "noEngineReferences": false
 }

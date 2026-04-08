@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SdFormat.Math
+namespace SDFormat.Math
 {
     /// <summary>
     /// A 3D vector with double components. Replaces gz::math::Vector3d.

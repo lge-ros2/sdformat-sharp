@@ -6,7 +6,7 @@
 
 using System.Collections.Generic;
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// A noise model, used by sensors to add noise to readings.

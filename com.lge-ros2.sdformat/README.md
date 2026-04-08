@@ -1,4 +1,4 @@
-# SdFormat — Unity Package
+# SDFormat — Unity Package
 
 A pure C# **SDF (Simulation Description Format)** parser and DOM library for Unity.  
 Parse, inspect, modify, and build SDF robot / world descriptions — no native plugins required.
@@ -56,7 +56,7 @@ Then **Window → Package Manager → + → Add package from tarball…**
 ### Parse an SDF file
 
 ```csharp
-using SdFormat;
+using SDFormat;
 
 var root = new Root();
 var errors = root.LoadSdfString(mySdfXml);
@@ -71,8 +71,8 @@ for (int w = 0; w < root.WorldCount; w++)
 ### Spawn into Unity scene
 
 ```csharp
-using SdFormat;
-using SdFormat.Unity;
+using SDFormat;
+using SDFormat.Unity;
 
 var root = new Root();
 root.LoadSdfString(sdfXml);
@@ -82,8 +82,8 @@ SdfSpawner.Spawn(root);   // creates GameObjects with primitives & colliders
 ### Build a model from code
 
 ```csharp
-using SdFormat;
-using SdFormat.Math;
+using SDFormat;
+using SDFormat.Math;
 
 var model = new Model { Name = "my_box" };
 var link = new Link { Name = "body" };
@@ -99,8 +99,8 @@ string xml = model.ToElement().ToString("");
 ### Coordinate conversion
 
 ```csharp
-using SdFormat.Unity;
-using SdFormat.Math;
+using SDFormat.Unity;
+using SDFormat.Math;
 
 Vector3d sdfPos = new Vector3d(1, 2, 3);
 UnityEngine.Vector3 unityPos = sdfPos.ToUnity(); // (1, 3, 2)
@@ -113,13 +113,13 @@ Pose3d back = transform.ToPose3d();
 
 | Assembly | Description |
 |---|---|
-| `lge-ros2.SdFormat` | Core parser & DOM — no Unity dependency, `noEngineReferences: true` |
-| `lge-ros2.SdFormat.Unity` | Bridge, spawner — references `UnityEngine` |
-| `lge-ros2.SdFormat.Editor` | `.sdf` importer — Editor-only |
+| `lge-ros2.SDFormat` | Core parser & DOM — no Unity dependency, `noEngineReferences: true` |
+| `lge-ros2.SDFormat.Unity` | Bridge, spawner — references `UnityEngine` |
+| `lge-ros2.SDFormat.Editor` | `.sdf` importer — Editor-only |
 
 ## Samples
 
-Import via **Package Manager → SdFormat → Samples**:
+Import via **Package Manager → SDFormat → Samples**:
 
 - **Parse World** — Load `world.sdf`, log structure, spawn GameObjects
 - **Build Model** — Construct a diff-drive robot from code, serialize & spawn

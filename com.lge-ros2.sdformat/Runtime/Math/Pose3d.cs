@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SdFormat.Math
+namespace SDFormat.Math
 {
     /// <summary>
     /// A 3D pose composed of a position (Vector3d) and rotation (Quaterniond).

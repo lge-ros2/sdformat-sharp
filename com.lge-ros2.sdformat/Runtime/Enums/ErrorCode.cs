@@ -4,7 +4,7 @@
 
 #nullable enable
 
-namespace SdFormat
+namespace SDFormat
 {
     /// <summary>
     /// Set of error codes. Each code is associated with a human-readable error message.

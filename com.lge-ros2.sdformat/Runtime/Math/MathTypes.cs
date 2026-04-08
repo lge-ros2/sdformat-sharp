@@ -5,7 +5,7 @@
 
 using System;
 
-namespace SdFormat.Math
+namespace SDFormat.Math
 {
     /// <summary>
     /// An RGBA color with float components [0, 1]. Replaces gz::math::Color.

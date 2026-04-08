@@ -1,4 +1,4 @@
-// SdFormat Unity Sample — Parse an SDF world file and spawn it in the scene.
+// SDFormat Unity Sample — Parse an SDF world file and spawn it in the scene.
 //
 // Usage:
 //   1. Attach this MonoBehaviour to any GameObject.
@@ -6,10 +6,10 @@
 //   3. Press Play — the SDF world will appear as GameObjects.
 
 using UnityEngine;
-using SdFormat;
-using SdFormat.Unity;
+using SDFormat;
+using SDFormat.Unity;
 
-namespace SdFormat.Samples
+namespace SDFormat.Samples
 {
     public class ParseWorldSample : MonoBehaviour
     {
