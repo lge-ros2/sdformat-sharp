@@ -14,11 +14,8 @@ namespace SDFormat
     /// A link contains the physical properties of a body within a model,
     /// including collision geometry, visual appearance, and sensor attachments.
     /// </summary>
-    public class Link
+    public class Link : SdfNamedPosedElement
     {
-        /// <summary>Name of the link.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>Optional density (kg/m^3).</summary>
         public double? Density { get; set; }
 
@@ -33,12 +30,6 @@ namespace SDFormat
 
         /// <summary>Auto-inertia parameters element.</summary>
         public Element? AutoInertiaParams { get; set; }
-
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
 
         /// <summary>Whether wind affects this link.</summary>
         public bool EnableWind { get; set; }
@@ -66,9 +57,6 @@ namespace SDFormat
 
         /// <summary>Projectors.</summary>
         public List<Element> Projectors { get; } = new();
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         // ---- Visual accessors ----
         public int VisualCount => Visuals.Count;

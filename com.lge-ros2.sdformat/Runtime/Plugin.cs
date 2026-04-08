@@ -13,7 +13,7 @@ namespace SDFormat
     /// An SDF plugin element, identified by name and filename.
     /// Plugins can contain arbitrary child elements as content.
     /// </summary>
-    public class Plugin
+    public class Plugin : SdfElement
     {
         /// <summary>The name of the plugin.</summary>
         public string Name { get; set; } = string.Empty;
@@ -23,9 +23,6 @@ namespace SDFormat
 
         /// <summary>Arbitrary child elements (content).</summary>
         public List<Element> Contents { get; } = new();
-
-        /// <summary>The SDF element from which this was loaded.</summary>
-        public Element? Element { get; set; }
 
         public Plugin() { }
 

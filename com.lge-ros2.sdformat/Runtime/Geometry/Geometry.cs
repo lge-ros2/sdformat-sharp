@@ -13,7 +13,7 @@ namespace SDFormat
     /// Geometry provides access to a shape, such as a Box, Sphere, Cylinder, etc.
     /// Use the Type property to determine which shape, then access via the appropriate Shape property.
     /// </summary>
-    public class Geometry
+    public class Geometry : SdfElement
     {
         /// <summary>Type of the geometry shape.</summary>
         public GeometryType Type { get; set; } = GeometryType.Empty;
@@ -47,9 +47,6 @@ namespace SDFormat
 
         /// <summary>Polyline shapes (valid when Type == Polyline).</summary>
         public List<Polyline> PolylineShape { get; set; } = new();
-
-        /// <summary>The SDF element from which this was loaded.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load geometry from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

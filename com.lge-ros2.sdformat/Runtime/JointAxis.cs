@@ -46,7 +46,7 @@ namespace SDFormat
     /// <summary>
     /// Parameters for a joint axis, such as the axis direction, limits, dynamics.
     /// </summary>
-    public class JointAxis
+    public class JointAxis : SdfElement
     {
         /// <summary>The axis direction unit vector in the frame specified by XyzExpressedIn.</summary>
         public Vector3d Xyz { get; set; } = Vector3d.UnitZ;
@@ -86,9 +86,6 @@ namespace SDFormat
 
         /// <summary>Optional mimic constraint.</summary>
         public MimicConstraint? Mimic { get; set; }
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

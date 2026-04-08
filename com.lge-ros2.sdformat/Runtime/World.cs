@@ -14,7 +14,7 @@ namespace SDFormat
     /// A world is a container for models, actors, lights, and other objects.
     /// It also holds environment settings (gravity, atmosphere, scene, etc.).
     /// </summary>
-    public class World
+    public class World : SdfElement
     {
         /// <summary>Name of the world.</summary>
         public string Name { get; set; } = string.Empty;
@@ -63,9 +63,6 @@ namespace SDFormat
 
         /// <summary>Plugins.</summary>
         public List<Plugin> Plugins { get; } = new();
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         // ---- Model accessors ----
         public int ModelCount => Models.Count;

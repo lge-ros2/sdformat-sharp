@@ -14,7 +14,7 @@ namespace SDFormat
     /// Root of an SDF document. This is the top-level entry point that contains
     /// worlds and optionally a standalone model, light, or actor.
     /// </summary>
-    public class Root
+    public class Root : SdfElement
     {
         /// <summary>SDF version string (e.g. "1.12").</summary>
         public string Version { get; set; } = SdfDocument.DefaultVersion;
@@ -30,9 +30,6 @@ namespace SDFormat
 
         /// <summary>Standalone actor.</summary>
         public Actor? StandaloneActor { get; set; }
-
-        /// <summary>The underlying SDF element tree.</summary>
-        public Element? Element { get; set; }
 
         // ---- World accessors ----
 

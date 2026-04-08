@@ -12,19 +12,10 @@ namespace SDFormat
     /// <summary>
     /// Provides a description of a light source. A light can be point, spot, or directional.
     /// </summary>
-    public class Light
+    public class Light : SdfNamedPosedElement
     {
         /// <summary>Type of this light.</summary>
         public LightType Type { get; set; } = LightType.Point;
-
-        /// <summary>Name of the light.</summary>
-        public string Name { get; set; } = string.Empty;
-
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
 
         /// <summary>Whether the light casts shadows.</summary>
         public bool CastShadows { get; set; }
@@ -67,9 +58,6 @@ namespace SDFormat
 
         /// <summary>Spot falloff.</summary>
         public double SpotFalloff { get; set; }
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

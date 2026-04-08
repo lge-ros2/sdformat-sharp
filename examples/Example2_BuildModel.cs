@@ -8,7 +8,8 @@
 using SDFormat;
 using SDFormat.Math;
 
-namespace Examples;
+namespace Examples
+{
 
 public static class Example2_BuildModel
 {
@@ -163,4 +164,5 @@ public static class Example2_BuildModel
 
         return link;
     }
+}
 }

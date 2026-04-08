@@ -13,11 +13,8 @@ namespace SDFormat
     /// <summary>
     /// Description of a joint connecting two links within a model.
     /// </summary>
-    public class Joint
+    public class Joint : SdfNamedPosedElement
     {
-        /// <summary>Name of the joint.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>Type of joint (revolute, prismatic, etc.).</summary>
         public JointType Type { get; set; } = JointType.Invalid;
 
@@ -33,12 +30,6 @@ namespace SDFormat
         /// <summary>Secondary joint axis (for revolute2 and universal).</summary>
         public JointAxis? Axis2 { get; set; }
 
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
-
         /// <summary>Screw thread pitch (for screw joints).</summary>
         public double ScrewThreadPitch { get; set; }
 
@@ -47,9 +38,6 @@ namespace SDFormat
 
         /// <summary>Sensors attached to this joint.</summary>
         public List<Sensor> Sensors { get; } = new();
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Get the primary or secondary axis by index (0 or 1).</summary>
         public JointAxis? GetAxis(int index)

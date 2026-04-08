@@ -12,13 +12,10 @@ using SDFormat.Math;
 namespace SDFormat
 {
     /// <summary>Box geometry defined by its three dimensions.</summary>
-    public class Box
+    public class Box : SdfElement
     {
         /// <summary>The three dimensional size of the box (x, y, z).</summary>
         public Vector3d Size { get; set; } = new(1, 1, 1);
-
-        /// <summary>The SDF element from which this was loaded.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)
@@ -44,12 +41,10 @@ namespace SDFormat
     }
 
     /// <summary>Sphere geometry defined by its radius.</summary>
-    public class Sphere
+    public class Sphere : SdfElement
     {
         /// <summary>The radius of the sphere in meters.</summary>
         public double Radius { get; set; } = 1.0;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -73,15 +68,13 @@ namespace SDFormat
     }
 
     /// <summary>Cylinder geometry defined by radius and length.</summary>
-    public class Cylinder
+    public class Cylinder : SdfElement
     {
         /// <summary>The radius of the cylinder in meters.</summary>
         public double Radius { get; set; } = 0.5;
 
         /// <summary>The length of the cylinder in meters.</summary>
         public double Length { get; set; } = 1.0;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -110,15 +103,13 @@ namespace SDFormat
     }
 
     /// <summary>Capsule geometry (cylinder with hemispherical end caps).</summary>
-    public class Capsule
+    public class Capsule : SdfElement
     {
         /// <summary>The radius of the capsule in meters.</summary>
         public double Radius { get; set; } = 0.5;
 
         /// <summary>The length of the cylindrical portion in meters.</summary>
         public double Length { get; set; } = 1.0;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -147,15 +138,13 @@ namespace SDFormat
     }
 
     /// <summary>Cone geometry defined by radius and length.</summary>
-    public class Cone
+    public class Cone : SdfElement
     {
         /// <summary>The radius of the cone base in meters.</summary>
         public double Radius { get; set; } = 0.5;
 
         /// <summary>The length (height) of the cone in meters.</summary>
         public double Length { get; set; } = 1.0;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -184,12 +173,10 @@ namespace SDFormat
     }
 
     /// <summary>Ellipsoid geometry defined by its three radii.</summary>
-    public class Ellipsoid
+    public class Ellipsoid : SdfElement
     {
         /// <summary>The three radii of the ellipsoid (x, y, z).</summary>
         public Vector3d Radii { get; set; } = new(1, 1, 1);
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -212,15 +199,13 @@ namespace SDFormat
     }
 
     /// <summary>Plane geometry defined by a normal vector and a size.</summary>
-    public class Plane
+    public class Plane : SdfElement
     {
         /// <summary>The normal direction of the plane.</summary>
         public Vector3d Normal { get; set; } = Vector3d.UnitZ;
 
         /// <summary>The 2D size of the plane (width and height).</summary>
         public Vector2d Size { get; set; } = new(1, 1);
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -253,7 +238,7 @@ namespace SDFormat
     }
 
     /// <summary>Mesh geometry referencing an external mesh file.</summary>
-    public class Mesh
+    public class Mesh : SdfElement
     {
         /// <summary>The URI of the mesh file.</summary>
         public string Uri { get; set; } = string.Empty;
@@ -272,8 +257,6 @@ namespace SDFormat
 
         /// <summary>Optimization level (none, convex_decomposition, convex_hull).</summary>
         public string OptimizationStr { get; set; } = string.Empty;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -318,7 +301,7 @@ namespace SDFormat
     }
 
     /// <summary>Heightmap geometry (terrain from heightmap image).</summary>
-    public class Heightmap
+    public class Heightmap : SdfElement
     {
         /// <summary>The URI of the heightmap image.</summary>
         public string Uri { get; set; } = string.Empty;
@@ -337,8 +320,6 @@ namespace SDFormat
 
         /// <summary>Sampling rate for the heightmap.</summary>
         public uint Sampling { get; set; } = 1;
-
-        public Element? Element { get; set; }
 
         /// <summary>Heightmap texture blend specification.</summary>
         public class Texture
@@ -383,7 +364,7 @@ namespace SDFormat
     }
 
     /// <summary>A 2D polyline defined by a series of points and a height.</summary>
-    public class Polyline
+    public class Polyline : SdfElement
     {
         /// <summary>The height of the polyline extrusion.</summary>
         public double Height { get; set; } = 1.0;
@@ -391,15 +372,30 @@ namespace SDFormat
         /// <summary>The 2D points of the polyline.</summary>
         public List<Vector2d> Points { get; } = new();
 
-        public Element? Element { get; set; }
-
         public List<SdfError> Load(Element sdf)
         {
             var errors = new List<SdfError>();
             Element = sdf;
             var heightElem = sdf.FindElement("height");
             if (heightElem?.Value != null) Height = heightElem.Value.DoubleValue;
-            // Points would be loaded from child <point> elements
+
+            var pointElem = sdf.FindElement("point");
+            while (pointElem != null)
+            {
+                if (pointElem.Value != null)
+                {
+                    try
+                    {
+                        Points.Add(Vector2d.Parse(pointElem.Value.StringValue));
+                    }
+                    catch (System.FormatException ex)
+                    {
+                        errors.Add(new SdfError(ErrorCode.ElementInvalid,
+                            $"Failed to parse polyline point: {ex.Message}"));
+                    }
+                }
+                pointElem = pointElem.GetNextElement("point");
+            }
             return errors;
         }
     }

@@ -14,11 +14,8 @@ namespace SDFormat
     /// A model describes a complete robot or object, consisting of links
     /// connected by joints, with optional nested models.
     /// </summary>
-    public class Model
+    public class Model : SdfNamedPosedElement
     {
-        /// <summary>Name of the model.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>Whether the model is static (does not move).</summary>
         public bool Static { get; set; }
 
@@ -30,12 +27,6 @@ namespace SDFormat
 
         /// <summary>Whether wind is enabled for this model.</summary>
         public bool EnableWind { get; set; }
-
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
 
         /// <summary>Name of the canonical link.</summary>
         public string CanonicalLinkName { get; set; } = string.Empty;
@@ -60,9 +51,6 @@ namespace SDFormat
 
         /// <summary>Plugins.</summary>
         public List<Plugin> Plugins { get; } = new();
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         // ---- Link accessors ----
         public int LinkCount => Links.Count;

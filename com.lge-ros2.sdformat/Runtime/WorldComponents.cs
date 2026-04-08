@@ -11,13 +11,12 @@ using SDFormat.Math;
 namespace SDFormat
 {
     /// <summary>Atmosphere model settings.</summary>
-    public class Atmosphere
+    public class Atmosphere : SdfElement
     {
         public AtmosphereType Type { get; set; } = AtmosphereType.Adiabatic;
         public Temperature Temperature { get; set; } = new(288.15);
         public double TemperatureGradient { get; set; } = -0.0065;
         public double Pressure { get; set; } = 101325.0;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -44,7 +43,7 @@ namespace SDFormat
     }
 
     /// <summary>Sky settings for a scene (sun direction, clouds, etc.).</summary>
-    public class Sky
+    public class Sky : SdfElement
     {
         public double Time { get; set; } = 10.0;
         public double Sunrise { get; set; } = 6.0;
@@ -54,7 +53,6 @@ namespace SDFormat
         public double CloudHumidity { get; set; } = 0.5;
         public double CloudMeanSize { get; set; } = 0.5;
         public Color CloudAmbient { get; set; } = new(0.8f, 0.8f, 0.8f, 1f);
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -65,7 +63,7 @@ namespace SDFormat
     }
 
     /// <summary>Scene properties (ambient light, background color, etc.).</summary>
-    public class Scene
+    public class Scene : SdfElement
     {
         public Color Ambient { get; set; } = new(0.4f, 0.4f, 0.4f, 1f);
         public Color Background { get; set; } = new(0.7f, 0.7f, 0.7f, 1f);
@@ -73,7 +71,6 @@ namespace SDFormat
         public bool OriginVisual { get; set; } = true;
         public bool Shadows { get; set; } = true;
         public Sky? SkySettings { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -106,11 +103,10 @@ namespace SDFormat
     }
 
     /// <summary>GUI settings (fullscreen, plugins).</summary>
-    public class Gui
+    public class Gui : SdfElement
     {
         public bool Fullscreen { get; set; }
         public List<Plugin> Plugins { get; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -146,7 +142,7 @@ namespace SDFormat
     }
 
     /// <summary>Physics profile settings.</summary>
-    public class Physics
+    public class Physics : SdfElement
     {
         public string Name { get; set; } = "default_physics";
         public bool IsDefault { get; set; } = true;
@@ -154,7 +150,6 @@ namespace SDFormat
         public double MaxStepSize { get; set; } = 0.001;
         public double RealTimeFactor { get; set; } = 1.0;
         public int MaxContacts { get; set; } = 20;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -194,14 +189,13 @@ namespace SDFormat
     // ---- Actor classes ----
 
     /// <summary>An animation for an actor.</summary>
-    public class Animation
+    public class Animation : SdfElement
     {
         public string Name { get; set; } = string.Empty;
         public string Filename { get; set; } = string.Empty;
         public string FilePath { get; set; } = string.Empty;
         public double Scale { get; set; } = 1.0;
         public bool InterpolateX { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -220,11 +214,10 @@ namespace SDFormat
     }
 
     /// <summary>A waypoint for an actor trajectory.</summary>
-    public class Waypoint
+    public class Waypoint : SdfElement
     {
         public double Time { get; set; }
         public Pose3d Pose { get; set; } = Pose3d.Zero;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -239,13 +232,12 @@ namespace SDFormat
     }
 
     /// <summary>A trajectory for an actor's animation.</summary>
-    public class Trajectory
+    public class Trajectory : SdfElement
     {
         public ulong Id { get; set; }
         public string Type { get; set; } = string.Empty;
         public double Tension { get; set; }
         public List<Waypoint> Waypoints { get; } = new();
-        public Element? Element { get; set; }
 
         public int WaypointCount => Waypoints.Count;
         public Waypoint? WaypointByIndex(int index) =>
@@ -281,11 +273,8 @@ namespace SDFormat
     }
 
     /// <summary>An animated actor in the world.</summary>
-    public class Actor
+    public class Actor : SdfNamedPosedElement
     {
-        public string Name { get; set; } = string.Empty;
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-        public string PoseRelativeTo { get; set; } = string.Empty;
         public string FilePath { get; set; } = string.Empty;
         public string SkinFilename { get; set; } = string.Empty;
         public double SkinScale { get; set; } = 1.0;
@@ -297,7 +286,6 @@ namespace SDFormat
         public List<Link> Links { get; } = new();
         public List<Joint> Joints { get; } = new();
         public List<Plugin> Plugins { get; } = new();
-        public Element? Element { get; set; }
 
         public int AnimationCount => Animations.Count;
         public Animation? AnimationByIndex(int index) =>

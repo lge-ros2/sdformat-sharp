@@ -13,11 +13,10 @@ namespace SDFormat
     // ---- Sensor sub-type classes ----
 
     /// <summary>Altimeter sensor properties.</summary>
-    public class AltimeterSensor
+    public class AltimeterSensor : SdfElement
     {
         public Noise VerticalPositionNoise { get; set; } = new();
         public Noise VerticalVelocityNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -28,11 +27,10 @@ namespace SDFormat
     }
 
     /// <summary>Air pressure sensor properties.</summary>
-    public class AirPressureSensor
+    public class AirPressureSensor : SdfElement
     {
         public double ReferenceAltitude { get; set; }
         public Noise PressureNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -43,10 +41,9 @@ namespace SDFormat
     }
 
     /// <summary>Air speed sensor properties.</summary>
-    public class AirSpeedSensor
+    public class AirSpeedSensor : SdfElement
     {
         public Noise PressureNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -57,7 +54,7 @@ namespace SDFormat
     }
 
     /// <summary>Camera sensor properties.</summary>
-    public class CameraSensor
+    public class CameraSensor : SdfElement
     {
         public string Name { get; set; } = string.Empty;
         public double HorizontalFov { get; set; } = 1.047;
@@ -75,7 +72,6 @@ namespace SDFormat
         public uint VisibilityMask { get; set; } = 0xFFFFFFFF;
         public bool HasTriggeredCamera { get; set; }
         public string TriggerTopic { get; set; } = string.Empty;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -110,7 +106,7 @@ namespace SDFormat
     }
 
     /// <summary>Force-torque sensor properties.</summary>
-    public class ForceTorqueSensor
+    public class ForceTorqueSensor : SdfElement
     {
         public enum FrameType { Child, Parent, Sensor }
         public enum MeasureDirectionType { ChildToParent, ParentToChild }
@@ -123,7 +119,6 @@ namespace SDFormat
         public Noise TorqueXNoise { get; set; } = new();
         public Noise TorqueYNoise { get; set; } = new();
         public Noise TorqueZNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -134,7 +129,7 @@ namespace SDFormat
     }
 
     /// <summary>IMU sensor properties.</summary>
-    public class ImuSensor
+    public class ImuSensor : SdfElement
     {
         public Noise LinearAccelerationXNoise { get; set; } = new();
         public Noise LinearAccelerationYNoise { get; set; } = new();
@@ -147,7 +142,6 @@ namespace SDFormat
         public Vector3d CustomRpy { get; set; } = Vector3d.Zero;
         public string CustomRpyParentFrame { get; set; } = string.Empty;
         public bool OrientationEnabled { get; set; } = true;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -158,7 +152,7 @@ namespace SDFormat
     }
 
     /// <summary>Lidar (ray) sensor properties.</summary>
-    public class LidarSensor
+    public class LidarSensor : SdfElement
     {
         public uint HorizontalScanSamples { get; set; } = 640;
         public double HorizontalScanResolution { get; set; } = 1.0;
@@ -173,7 +167,6 @@ namespace SDFormat
         public double RangeResolution { get; set; } = 0.0;
         public Noise RangeNoise { get; set; } = new();
         public uint VisibilityMask { get; set; } = 0xFFFFFFFF;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -184,12 +177,11 @@ namespace SDFormat
     }
 
     /// <summary>Magnetometer sensor properties.</summary>
-    public class MagnetometerSensor
+    public class MagnetometerSensor : SdfElement
     {
         public Noise XNoise { get; set; } = new();
         public Noise YNoise { get; set; } = new();
         public Noise ZNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -200,13 +192,12 @@ namespace SDFormat
     }
 
     /// <summary>NavSat (GPS) sensor properties.</summary>
-    public class NavSatSensor
+    public class NavSatSensor : SdfElement
     {
         public Noise HorizontalPositionNoise { get; set; } = new();
         public Noise VerticalPositionNoise { get; set; } = new();
         public Noise HorizontalVelocityNoise { get; set; } = new();
         public Noise VerticalVelocityNoise { get; set; } = new();
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -221,11 +212,8 @@ namespace SDFormat
     /// <summary>
     /// Information about an SDF sensor. A sensor can be attached to a link or joint.
     /// </summary>
-    public class Sensor
+    public class Sensor : SdfNamedPosedElement
     {
-        /// <summary>Name of the sensor.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>Sensor type.</summary>
         public SensorType Type { get; set; } = SensorType.None;
 
@@ -240,15 +228,6 @@ namespace SDFormat
 
         /// <summary>Update rate in Hz.</summary>
         public double UpdateRate { get; set; }
-
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         // Sensor-specific data
         public AltimeterSensor? Altimeter { get; set; }

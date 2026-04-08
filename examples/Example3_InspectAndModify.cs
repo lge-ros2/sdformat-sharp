@@ -9,7 +9,8 @@
 using SDFormat;
 using SDFormat.Math;
 
-namespace Examples;
+namespace Examples
+{
 
 public static class Example3_InspectAndModify
 {
@@ -117,4 +118,5 @@ public static class Example3_InspectAndModify
         var rootElem = SdfDocument.WrapInRoot(arm.ToElement());
         Console.WriteLine(rootElem.ToString("  "));
     }
+}
 }

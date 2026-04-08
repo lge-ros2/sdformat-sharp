@@ -10,12 +10,10 @@ using SDFormat.Math;
 namespace SDFormat
 {
     /// <summary>Contact properties of a surface.</summary>
-    public class Contact
+    public class Contact : SdfElement
     {
         /// <summary>The collide bitmask for filtering collision pairs.</summary>
         public ushort CollideBitmask { get; set; } = 0xFF;
-
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -29,14 +27,13 @@ namespace SDFormat
     }
 
     /// <summary>ODE friction parameters.</summary>
-    public class OdeFriction
+    public class OdeFriction : SdfElement
     {
         public double Mu { get; set; } = 1.0;
         public double Mu2 { get; set; } = 1.0;
         public Vector3d Fdir1 { get; set; } = Vector3d.Zero;
         public double Slip1 { get; set; }
         public double Slip2 { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -55,13 +52,12 @@ namespace SDFormat
     }
 
     /// <summary>Bullet friction parameters.</summary>
-    public class BulletFriction
+    public class BulletFriction : SdfElement
     {
         public double Friction { get; set; } = 1.0;
         public double Friction2 { get; set; } = 1.0;
         public Vector3d Fdir1 { get; set; } = Vector3d.Zero;
         public double RollingFriction { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -72,14 +68,13 @@ namespace SDFormat
     }
 
     /// <summary>Torsional friction parameters.</summary>
-    public class Torsional
+    public class Torsional : SdfElement
     {
         public double Coefficient { get; set; } = 1.0;
         public bool UsePatchRadius { get; set; } = true;
         public double PatchRadius { get; set; }
         public double SurfaceRadius { get; set; }
         public double OdeSlip { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -90,12 +85,11 @@ namespace SDFormat
     }
 
     /// <summary>Friction properties of a surface.</summary>
-    public class Friction
+    public class Friction : SdfElement
     {
         public OdeFriction? Ode { get; set; }
         public BulletFriction? Bullet { get; set; }
         public Torsional? TorsionalFriction { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -123,11 +117,10 @@ namespace SDFormat
     }
 
     /// <summary>Surface properties combining contact and friction.</summary>
-    public class Surface
+    public class Surface : SdfElement
     {
         public Contact? ContactInfo { get; set; }
         public Friction? FrictionInfo { get; set; }
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {

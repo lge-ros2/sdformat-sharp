@@ -11,7 +11,7 @@ namespace SDFormat
     /// <summary>
     /// A noise model, used by sensors to add noise to readings.
     /// </summary>
-    public class Noise
+    public class Noise : SdfElement
     {
         /// <summary>Type of noise model.</summary>
         public NoiseType Type { get; set; } = NoiseType.None;
@@ -36,9 +36,6 @@ namespace SDFormat
 
         /// <summary>Correlation time of the dynamic bias in seconds.</summary>
         public double DynamicBiasCorrelationTime { get; set; }
-
-        /// <summary>The SDF element from which this was loaded.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

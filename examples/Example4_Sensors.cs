@@ -9,7 +9,8 @@
 using SDFormat;
 using SDFormat.Math;
 
-namespace Examples;
+namespace Examples
+{
 
 public static class Example4_Sensors
 {
@@ -133,4 +134,5 @@ public static class Example4_Sensors
         var rootElem = SdfDocument.WrapInRoot(model.ToElement());
         Console.WriteLine(rootElem.ToString("  "));
     }
+}
 }

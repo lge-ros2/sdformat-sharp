@@ -12,11 +12,8 @@ namespace SDFormat
     /// <summary>
     /// A visual element describes the appearance of a link.
     /// </summary>
-    public class Visual
+    public class Visual : SdfNamedPosedElement
     {
-        /// <summary>Name of the visual.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>Whether the visual casts shadows.</summary>
         public bool CastShadows { get; set; } = true;
 
@@ -29,12 +26,6 @@ namespace SDFormat
         /// <summary>Material properties.</summary>
         public Material? MaterialInfo { get; set; }
 
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
-
         /// <summary>Visibility flags bitmask.</summary>
         public uint VisibilityFlags { get; set; } = 0xFFFFFFFF;
 
@@ -46,9 +37,6 @@ namespace SDFormat
 
         /// <summary>Plugins attached to this visual.</summary>
         public List<Plugin> Plugins { get; } = new();
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

@@ -12,7 +12,7 @@ namespace SDFormat
     /// <summary>
     /// PBR workflow properties (metallic or specular).
     /// </summary>
-    public class PbrWorkflow
+    public class PbrWorkflow : SdfElement
     {
         public PbrWorkflowType Type { get; set; } = PbrWorkflowType.None;
         public string AlbedoMap { get; set; } = string.Empty;
@@ -30,7 +30,6 @@ namespace SDFormat
         public string GlossinessMap { get; set; } = string.Empty;
         public double Glossiness { get; set; }
         public string SpecularMap { get; set; } = string.Empty;
-        public Element? Element { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -43,11 +42,9 @@ namespace SDFormat
     /// <summary>
     /// PBR material settings containing metal and/or specular workflows.
     /// </summary>
-    public class Pbr
+    public class Pbr : SdfElement
     {
         private readonly Dictionary<PbrWorkflowType, PbrWorkflow> _workflows = new();
-
-        public Element? Element { get; set; }
 
         public void SetWorkflow(PbrWorkflowType type, PbrWorkflow workflow)
         {
@@ -84,7 +81,7 @@ namespace SDFormat
     /// <summary>
     /// Visual material properties, including color, shader, and PBR settings.
     /// </summary>
-    public class Material
+    public class Material : SdfElement
     {
         /// <summary>Ambient color.</summary>
         public Color Ambient { get; set; } = new(0f, 0f, 0f, 1f);
@@ -128,9 +125,6 @@ namespace SDFormat
         /// <summary>The file path.</summary>
         public string FilePath { get; set; } = string.Empty;
 
-        /// <summary>The SDF element from which this was loaded.</summary>
-        public Element? Element { get; set; }
-
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)
         {
@@ -149,6 +143,36 @@ namespace SDFormat
             if (lighting?.Value != null) Lighting = lighting.Value.BoolValue;
             var doubleSided = sdf.FindElement("double_sided");
             if (doubleSided?.Value != null) DoubleSided = doubleSided.Value.BoolValue;
+
+            // Parse <script> element for Ogre material scripts
+            var scriptElem = sdf.FindElement("script");
+            if (scriptElem != null)
+            {
+                var uriElem = scriptElem.FindElement("uri");
+                if (uriElem?.Value != null) ScriptUri = uriElem.Value.StringValue;
+                var nameElem = scriptElem.FindElement("name");
+                if (nameElem?.Value != null) ScriptName = nameElem.Value.StringValue;
+            }
+
+            // Parse <shader> element
+            var shaderElem = sdf.FindElement("shader");
+            if (shaderElem != null)
+            {
+                var typeAttr = shaderElem.GetAttribute("type");
+                if (typeAttr != null)
+                {
+                    var typeStr = typeAttr.GetAsString();
+                    Shader = typeStr switch
+                    {
+                        "vertex" => ShaderType.Vertex,
+                        "normal_map_objectspace" => ShaderType.NormalMapObjectSpace,
+                        "normal_map_tangentspace" => ShaderType.NormalMapTangentSpace,
+                        _ => ShaderType.Pixel,
+                    };
+                }
+                var normalMapElem = shaderElem.FindElement("normal_map");
+                if (normalMapElem?.Value != null) NormalMap = normalMapElem.Value.StringValue;
+            }
 
             if (sdf.HasElement("pbr"))
             {

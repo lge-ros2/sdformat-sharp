@@ -12,24 +12,12 @@ namespace SDFormat
     /// <summary>
     /// An explicit frame defined in a model or world.
     /// </summary>
-    public class Frame
+    public class Frame : SdfNamedPosedElement
     {
-        /// <summary>Name of the frame.</summary>
-        public string Name { get; set; } = string.Empty;
-
         /// <summary>
         /// Name of the body (link/model/frame) to which this frame is attached.
         /// </summary>
         public string AttachedTo { get; set; } = string.Empty;
-
-        /// <summary>The raw pose.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

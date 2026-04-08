@@ -13,13 +13,10 @@ namespace SDFormat
     /// A collision element describes the collision properties of a link,
     /// including its geometry and surface contact parameters.
     /// </summary>
-    public class Collision
+    public class Collision : SdfNamedPosedElement
     {
         /// <summary>Default density value (kg/m^3, water).</summary>
         public const double DefaultDensity = 1000.0;
-
-        /// <summary>Name of the collision.</summary>
-        public string Name { get; set; } = string.Empty;
 
         /// <summary>Density (kg/m^3).</summary>
         public double Density { get; set; } = DefaultDensity;
@@ -30,17 +27,8 @@ namespace SDFormat
         /// <summary>Surface properties.</summary>
         public Surface? SurfaceInfo { get; set; }
 
-        /// <summary>The raw pose relative to a frame.</summary>
-        public Pose3d RawPose { get; set; } = Pose3d.Zero;
-
-        /// <summary>Name of the frame this pose is relative to.</summary>
-        public string PoseRelativeTo { get; set; } = string.Empty;
-
         /// <summary>Auto-inertia parameters element.</summary>
         public Element? AutoInertiaParams { get; set; }
-
-        /// <summary>The SDF element.</summary>
-        public Element? Element { get; set; }
 
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)

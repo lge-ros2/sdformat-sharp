@@ -7,7 +7,8 @@
 
 using SDFormat;
 
-namespace Examples;
+namespace Examples
+{
 
 public static class Example1_ParseWorld
 {
@@ -154,4 +155,5 @@ public static class Example1_ParseWorld
                 break;
         }
     }
+}
 }
