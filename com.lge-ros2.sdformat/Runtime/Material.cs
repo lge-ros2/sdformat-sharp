@@ -35,13 +35,55 @@ namespace SDFormat
         {
             var errors = new List<SdfError>();
             Element = sdf;
+
+            var albedo = sdf.FindElement("albedo_map");
+            if (albedo?.Value != null) AlbedoMap = albedo.Value.GetAsString();
+            var normal = sdf.FindElement("normal_map");
+            if (normal?.Value != null)
+            {
+                NormalMap = normal.Value.GetAsString();
+                var typeAttr = normal.GetAttribute("type");
+                if (typeAttr != null)
+                {
+                    NormalMapType = typeAttr.GetAsString().ToLowerInvariant() switch
+                    {
+                        "object" => NormalMapSpace.Object,
+                        _ => NormalMapSpace.Tangent,
+                    };
+                }
+            }
+            var envMap = sdf.FindElement("environment_map");
+            if (envMap?.Value != null) EnvironmentMap = envMap.Value.GetAsString();
+            var aoMap = sdf.FindElement("ambient_occlusion_map");
+            if (aoMap?.Value != null) AmbientOcclusionMap = aoMap.Value.GetAsString();
+            var roughMap = sdf.FindElement("roughness_map");
+            if (roughMap?.Value != null) RoughnessMap = roughMap.Value.GetAsString();
+            var metalMap = sdf.FindElement("metalness_map");
+            if (metalMap?.Value != null) MetalnessMap = metalMap.Value.GetAsString();
+            var emissiveMap = sdf.FindElement("emissive_map");
+            if (emissiveMap?.Value != null) EmissiveMap = emissiveMap.Value.GetAsString();
+            var lightMap = sdf.FindElement("light_map");
+            if (lightMap?.Value != null)
+            {
+                LightMap = lightMap.Value.GetAsString();
+                var uvSet = lightMap.GetAttribute("uv_set");
+                if (uvSet != null && uint.TryParse(uvSet.GetAsString(), out var uv))
+                    LightMapTexCoordSet = uv;
+            }
+            var metalness = sdf.FindElement("metalness");
+            if (metalness?.Value != null) Metalness = metalness.Value.DoubleValue;
+            var roughness = sdf.FindElement("roughness");
+            if (roughness?.Value != null) Roughness = roughness.Value.DoubleValue;
+            var glossMap = sdf.FindElement("glossiness_map");
+            if (glossMap?.Value != null) GlossinessMap = glossMap.Value.GetAsString();
+            var glossiness = sdf.FindElement("glossiness");
+            if (glossiness?.Value != null) Glossiness = glossiness.Value.DoubleValue;
+            var specMap = sdf.FindElement("specular_map");
+            if (specMap?.Value != null) SpecularMap = specMap.Value.GetAsString();
+
             return errors;
         }
     }
-
-    /// <summary>
-    /// PBR material settings containing metal and/or specular workflows.
-    /// </summary>
     public class Pbr : SdfElement
     {
         private readonly Dictionary<PbrWorkflowType, PbrWorkflow> _workflows = new();
@@ -143,6 +185,10 @@ namespace SDFormat
             if (lighting?.Value != null) Lighting = lighting.Value.BoolValue;
             var doubleSided = sdf.FindElement("double_sided");
             if (doubleSided?.Value != null) DoubleSided = doubleSided.Value.BoolValue;
+            var shininess = sdf.FindElement("shininess");
+            if (shininess?.Value != null) Shininess = shininess.Value.DoubleValue;
+            var renderOrder = sdf.FindElement("render_order");
+            if (renderOrder?.Value != null) RenderOrder = (float)renderOrder.Value.DoubleValue;
 
             // Parse <script> element for Ogre material scripts
             var scriptElem = sdf.FindElement("script");

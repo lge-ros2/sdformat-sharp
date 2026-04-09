@@ -131,6 +131,23 @@ namespace SDFormat
                 if (springStiff?.Value != null) SpringStiffness = springStiff.Value.DoubleValue;
             }
 
+            // Mimic constraint
+            var mimicElem = sdf.FindElement("mimic");
+            if (mimicElem != null)
+            {
+                Mimic = new MimicConstraint();
+                var jointAttr = mimicElem.GetAttribute("joint");
+                if (jointAttr != null) Mimic.Joint = jointAttr.GetAsString();
+                var axisAttr = mimicElem.GetAttribute("axis");
+                if (axisAttr != null) Mimic.Axis = axisAttr.GetAsString();
+                var multiplier = mimicElem.FindElement("multiplier");
+                if (multiplier?.Value != null) Mimic.Multiplier = multiplier.Value.DoubleValue;
+                var offset = mimicElem.FindElement("offset");
+                if (offset?.Value != null) Mimic.Offset = offset.Value.DoubleValue;
+                var reference = mimicElem.FindElement("reference");
+                if (reference?.Value != null) Mimic.Reference = reference.Value.DoubleValue;
+            }
+
             return errors;
         }
 

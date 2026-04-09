@@ -175,6 +175,32 @@ namespace SDFormat
                 errors.AddRange(GuiInfo.Load(sdf.FindElement("gui")!));
             }
 
+            // Spherical coordinates
+            if (sdf.HasElement("spherical_coordinates"))
+            {
+                var scElem = sdf.FindElement("spherical_coordinates")!;
+                SphericalCoordinatesInfo = new SphericalCoordinates();
+                var surfModel = scElem.FindElement("surface_model");
+                if (surfModel?.Value != null)
+                {
+                    SphericalCoordinatesInfo.Surface = surfModel.Value.GetAsString().ToUpperInvariant() switch
+                    {
+                        "EARTH_WGS84" => SphericalCoordinates.SurfaceType.EarthWgs84,
+                        _ => SphericalCoordinates.SurfaceType.EarthWgs84,
+                    };
+                }
+                var worldFrame = scElem.FindElement("world_frame_orientation");
+                if (worldFrame?.Value != null) SphericalCoordinatesInfo.WorldFrameOrientation = worldFrame.Value.GetAsString();
+                var lat = scElem.FindElement("latitude_deg");
+                if (lat?.Value != null) SphericalCoordinatesInfo.LatitudeDeg = lat.Value.DoubleValue;
+                var lon = scElem.FindElement("longitude_deg");
+                if (lon?.Value != null) SphericalCoordinatesInfo.LongitudeDeg = lon.Value.DoubleValue;
+                var elev = scElem.FindElement("elevation");
+                if (elev?.Value != null) SphericalCoordinatesInfo.ElevationM = elev.Value.DoubleValue;
+                var heading = scElem.FindElement("heading_deg");
+                if (heading?.Value != null) SphericalCoordinatesInfo.HeadingDeg = heading.Value.DoubleValue;
+            }
+
             // Physics profiles
             var physicsElem = sdf.FindElement("physics");
             while (physicsElem != null)

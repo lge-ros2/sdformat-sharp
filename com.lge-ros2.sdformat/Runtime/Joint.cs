@@ -149,6 +149,12 @@ namespace SDFormat
                 sensorElem = sensorElem.GetNextElement("sensor");
             }
 
+            // Screw thread pitch
+            var screwPitch = sdf.FindElement("screw_thread_pitch");
+            if (screwPitch?.Value != null) ScrewThreadPitch = screwPitch.Value.DoubleValue;
+            var threadPitch = sdf.FindElement("thread_pitch");
+            if (threadPitch?.Value != null) ThreadPitch = threadPitch.Value.DoubleValue;
+
             return errors;
         }
 

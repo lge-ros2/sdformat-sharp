@@ -22,6 +22,17 @@ namespace SDFormat
         {
             var errors = new List<SdfError>();
             Element = sdf;
+
+            var typeAttr = sdf.GetAttribute("type");
+            if (typeAttr != null)
+            {
+                Type = typeAttr.GetAsString().ToLowerInvariant() switch
+                {
+                    "adiabatic" => AtmosphereType.Adiabatic,
+                    _ => AtmosphereType.Adiabatic,
+                };
+            }
+
             var temp = sdf.FindElement("temperature");
             if (temp?.Value != null)
                 Temperature = new Temperature(temp.Value.DoubleValue);
@@ -58,6 +69,29 @@ namespace SDFormat
         {
             var errors = new List<SdfError>();
             Element = sdf;
+
+            var time = sdf.FindElement("time");
+            if (time?.Value != null) Time = time.Value.DoubleValue;
+            var sunrise = sdf.FindElement("sunrise");
+            if (sunrise?.Value != null) Sunrise = sunrise.Value.DoubleValue;
+            var sunset = sdf.FindElement("sunset");
+            if (sunset?.Value != null) Sunset = sunset.Value.DoubleValue;
+
+            var clouds = sdf.FindElement("clouds");
+            if (clouds != null)
+            {
+                var speed = clouds.FindElement("speed");
+                if (speed?.Value != null) CloudSpeed = speed.Value.DoubleValue;
+                var dir = clouds.FindElement("direction");
+                if (dir?.Value != null) CloudDirection = new Angle(dir.Value.DoubleValue);
+                var humidity = clouds.FindElement("humidity");
+                if (humidity?.Value != null) CloudHumidity = humidity.Value.DoubleValue;
+                var meanSize = clouds.FindElement("mean_size");
+                if (meanSize?.Value != null) CloudMeanSize = meanSize.Value.DoubleValue;
+                var ambient = clouds.FindElement("ambient");
+                if (ambient?.Value != null) CloudAmbient = ambient.Value.ColorValue;
+            }
+
             return errors;
         }
     }
@@ -71,6 +105,7 @@ namespace SDFormat
         public bool OriginVisual { get; set; } = true;
         public bool Shadows { get; set; } = true;
         public Sky? SkySettings { get; set; }
+        public Fog? FogSettings { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -85,11 +120,19 @@ namespace SDFormat
             if (grid?.Value != null) Grid = grid.Value.BoolValue;
             var shadows = sdf.FindElement("shadows");
             if (shadows?.Value != null) Shadows = shadows.Value.BoolValue;
+            var originVisual = sdf.FindElement("origin_visual");
+            if (originVisual?.Value != null) OriginVisual = originVisual.Value.BoolValue;
 
             if (sdf.HasElement("sky"))
             {
                 SkySettings = new Sky();
                 errors.AddRange(SkySettings.Load(sdf.FindElement("sky")!));
+            }
+
+            if (sdf.HasElement("fog"))
+            {
+                FogSettings = new Fog();
+                errors.AddRange(FogSettings.Load(sdf.FindElement("fog")!));
             }
 
             return errors;
@@ -99,6 +142,35 @@ namespace SDFormat
         {
             var elem = new Element { Name = "scene" };
             return elem;
+        }
+    }
+
+    /// <summary>Fog properties.</summary>
+    public class Fog : SdfElement
+    {
+        public Color FogColor { get; set; } = new(1f, 1f, 1f, 1f);
+        public string FogType { get; set; } = "none";
+        public double Start { get; set; } = 1.0;
+        public double End { get; set; } = 100.0;
+        public double Density { get; set; } = 1.0;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var color = sdf.FindElement("color");
+            if (color?.Value != null) FogColor = color.Value.ColorValue;
+            var type = sdf.FindElement("type");
+            if (type?.Value != null) FogType = type.Value.GetAsString();
+            var start = sdf.FindElement("start");
+            if (start?.Value != null) Start = start.Value.DoubleValue;
+            var end = sdf.FindElement("end");
+            if (end?.Value != null) End = end.Value.DoubleValue;
+            var density = sdf.FindElement("density");
+            if (density?.Value != null) Density = density.Value.DoubleValue;
+
+            return errors;
         }
     }
 
@@ -394,6 +466,16 @@ namespace SDFormat
                 errors.AddRange(joint.Load(jointElem));
                 Joints.Add(joint);
                 jointElem = jointElem.GetNextElement("joint");
+            }
+
+            // Plugins
+            var pluginElem = sdf.FindElement("plugin");
+            while (pluginElem != null)
+            {
+                var plugin = new Plugin();
+                errors.AddRange(plugin.Load(pluginElem));
+                Plugins.Add(plugin);
+                pluginElem = pluginElem.GetNextElement("plugin");
             }
 
             return errors;

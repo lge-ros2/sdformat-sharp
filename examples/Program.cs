@@ -10,9 +10,11 @@ Console.WriteLine("║  1. Parse World   – Load & print world.sdf   ║");
 Console.WriteLine("║  2. Build Model   – Create model from code   ║");
 Console.WriteLine("║  3. Inspect/Modify– Load, edit, re-serialize ║");
 Console.WriteLine("║  4. Sensors       – Create sensor-rich model  ║");
+Console.WriteLine("║  5. Full Parse    – Verify all SDF elements   ║");
+Console.WriteLine("║  6. Gazebosim     – Parse gazebosim SDF files  ║");
 Console.WriteLine("║  0. Run all                                   ║");
 Console.WriteLine("╚═══════════════════════════════════════════════╝");
-Console.Write("\nSelect example [0-4]: ");
+Console.Write("\nSelect example [0-6]: ");
 
 var input = args.Length > 0 ? args[0] : Console.ReadLine()?.Trim();
 var dataDir = Path.Combine(AppContext.BaseDirectory, "data");
@@ -24,6 +26,8 @@ switch (input)
     case "2": Example2_BuildModel.Run(); break;
     case "3": Example3_InspectAndModify.Run(); break;
     case "4": Example4_Sensors.Run(); break;
+    case "5": Example5_ComprehensiveParse.Run(); break;
+    case "6": Example6_ParseGazebosimSdf.Run(); break;
     default:
         Example1_ParseWorld.Run(worldSdf);
         Console.WriteLine();
@@ -32,5 +36,9 @@ switch (input)
         Example3_InspectAndModify.Run();
         Console.WriteLine();
         Example4_Sensors.Run();
+        Console.WriteLine();
+        Example5_ComprehensiveParse.Run();
+        Console.WriteLine();
+        Example6_ParseGazebosimSdf.Run();
         break;
 }

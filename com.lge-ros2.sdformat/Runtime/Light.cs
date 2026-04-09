@@ -100,6 +100,41 @@ namespace SDFormat
             var direction = sdf.FindElement("direction");
             if (direction?.Value != null) Direction = direction.Value.Vector3dValue;
 
+            var intensity = sdf.FindElement("intensity");
+            if (intensity?.Value != null) Intensity = intensity.Value.DoubleValue;
+
+            var lightOn = sdf.FindElement("light_on");
+            if (lightOn?.Value != null) LightOn = lightOn.Value.BoolValue;
+
+            var visualize = sdf.FindElement("visualize");
+            if (visualize?.Value != null) Visualize = visualize.Value.BoolValue;
+
+            // Attenuation
+            var attenuation = sdf.FindElement("attenuation");
+            if (attenuation != null)
+            {
+                var range = attenuation.FindElement("range");
+                if (range?.Value != null) AttenuationRange = range.Value.DoubleValue;
+                var constant = attenuation.FindElement("constant");
+                if (constant?.Value != null) ConstantAttenuationFactor = constant.Value.DoubleValue;
+                var linear = attenuation.FindElement("linear");
+                if (linear?.Value != null) LinearAttenuationFactor = linear.Value.DoubleValue;
+                var quadratic = attenuation.FindElement("quadratic");
+                if (quadratic?.Value != null) QuadraticAttenuationFactor = quadratic.Value.DoubleValue;
+            }
+
+            // Spot
+            var spot = sdf.FindElement("spot");
+            if (spot != null)
+            {
+                var innerAngle = spot.FindElement("inner_angle");
+                if (innerAngle?.Value != null) SpotInnerAngle = new Angle(innerAngle.Value.DoubleValue);
+                var outerAngle = spot.FindElement("outer_angle");
+                if (outerAngle?.Value != null) SpotOuterAngle = new Angle(outerAngle.Value.DoubleValue);
+                var falloff = spot.FindElement("falloff");
+                if (falloff?.Value != null) SpotFalloff = falloff.Value.DoubleValue;
+            }
+
             return errors;
         }
 

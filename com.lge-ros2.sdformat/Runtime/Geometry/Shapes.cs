@@ -262,6 +262,10 @@ namespace SDFormat
         {
             var errors = new List<SdfError>();
             Element = sdf;
+
+            var optAttr = sdf.GetAttribute("optimization");
+            if (optAttr != null) OptimizationStr = optAttr.GetAsString();
+
             var uriElem = sdf.FindElement("uri");
             if (uriElem?.Value != null) Uri = uriElem.Value.GetAsString();
 
@@ -349,6 +353,38 @@ namespace SDFormat
             if (sizeElem?.Value != null) Size = sizeElem.Value.Vector3dValue;
             var posElem = sdf.FindElement("pos");
             if (posElem?.Value != null) Position = posElem.Value.Vector3dValue;
+            var samplingElem = sdf.FindElement("sampling");
+            if (samplingElem?.Value != null) Sampling = (uint)samplingElem.Value.IntValue;
+
+            var useTerrainPaging = sdf.FindElement("use_terrain_paging");
+            if (useTerrainPaging?.Value != null) UseTerrainPaging = useTerrainPaging.Value.BoolValue;
+
+            var texElem = sdf.FindElement("texture");
+            while (texElem != null)
+            {
+                var tex = new Texture();
+                var diffuse = texElem.FindElement("diffuse");
+                if (diffuse?.Value != null) tex.Diffuse = diffuse.Value.GetAsString();
+                var normal = texElem.FindElement("normal");
+                if (normal?.Value != null) tex.Normal = normal.Value.GetAsString();
+                var texSize = texElem.FindElement("size");
+                if (texSize?.Value != null) tex.Size = texSize.Value.DoubleValue;
+                Textures.Add(tex);
+                texElem = texElem.GetNextElement("texture");
+            }
+
+            var blendElem = sdf.FindElement("blend");
+            while (blendElem != null)
+            {
+                var blend = new Blend();
+                var minH = blendElem.FindElement("min_height");
+                if (minH?.Value != null) blend.MinHeight = minH.Value.DoubleValue;
+                var fade = blendElem.FindElement("fade_dist");
+                if (fade?.Value != null) blend.FadeDistance = fade.Value.DoubleValue;
+                Blends.Add(blend);
+                blendElem = blendElem.GetNextElement("blend");
+            }
+
             return errors;
         }
 

@@ -65,6 +65,10 @@ namespace SDFormat
             if (bs?.Value != null) BiasStdDev = bs.Value.DoubleValue;
             var prec = sdf.FindElement("precision");
             if (prec?.Value != null) Precision = prec.Value.DoubleValue;
+            var dynStdDev = sdf.FindElement("dynamic_bias_stddev");
+            if (dynStdDev?.Value != null) DynamicBiasStdDev = dynStdDev.Value.DoubleValue;
+            var dynCorr = sdf.FindElement("dynamic_bias_correlation_time");
+            if (dynCorr?.Value != null) DynamicBiasCorrelationTime = dynCorr.Value.DoubleValue;
 
             return errors;
         }

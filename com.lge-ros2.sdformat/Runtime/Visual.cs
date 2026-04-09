@@ -38,6 +38,9 @@ namespace SDFormat
         /// <summary>Plugins attached to this visual.</summary>
         public List<Plugin> Plugins { get; } = new();
 
+        /// <summary>Meta layer index (for grouping visuals).</summary>
+        public int MetaLayer { get; set; }
+
         /// <summary>Load from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)
         {
@@ -70,6 +73,26 @@ namespace SDFormat
             {
                 MaterialInfo = new Material();
                 errors.AddRange(MaterialInfo.Load(sdf.FindElement("material")!));
+            }
+
+            // Laser retro
+            var laserRetro = sdf.FindElement("laser_retro");
+            if (laserRetro?.Value != null)
+            {
+                HasLaserRetro = true;
+                LaserRetro = laserRetro.Value.DoubleValue;
+            }
+
+            // Visibility flags
+            var visFlags = sdf.FindElement("visibility_flags");
+            if (visFlags?.Value != null) VisibilityFlags = (uint)visFlags.Value.IntValue;
+
+            // Meta
+            var meta = sdf.FindElement("meta");
+            if (meta != null)
+            {
+                var layer = meta.FindElement("layer");
+                if (layer?.Value != null) MetaLayer = layer.Value.IntValue;
             }
 
             // Load plugins

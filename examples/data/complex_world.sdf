@@ -1,0 +1,857 @@
+<?xml version='1.0' ?>
+<sdf version='1.12'>
+  <world name='test_world'>
+    <gravity>0 0 -9.81</gravity>
+    <magnetic_field>5.5645e-6 22.8758e-6 -42.3884e-6</magnetic_field>
+    <wind>
+      <linear_velocity>1.5 0.5 0</linear_velocity>
+    </wind>
+
+    <!-- Atmosphere -->
+    <atmosphere type='adiabatic'>
+      <temperature>288.15</temperature>
+      <temperature_gradient>-0.0065</temperature_gradient>
+      <pressure>101325</pressure>
+    </atmosphere>
+
+    <!-- Scene with sky -->
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.8 0.95 1</background>
+      <shadows>true</shadows>
+      <grid>true</grid>
+      <origin_visual>true</origin_visual>
+      <sky>
+        <time>12</time>
+        <sunrise>6</sunrise>
+        <sunset>18</sunset>
+        <clouds>
+          <speed>5</speed>
+          <direction>0.7</direction>
+          <humidity>0.6</humidity>
+          <mean_size>0.5</mean_size>
+          <ambient>0.9 0.9 0.9 1</ambient>
+        </clouds>
+      </sky>
+    </scene>
+
+    <!-- Multiple physics profiles -->
+    <physics name='fast_physics' type='ode'>
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <max_contacts>20</max_contacts>
+    </physics>
+
+    <physics name='precise_physics' default='true' type='bullet'>
+      <max_step_size>0.0005</max_step_size>
+      <real_time_factor>0.5</real_time_factor>
+      <max_contacts>50</max_contacts>
+    </physics>
+
+    <!-- Spherical coordinates -->
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <world_frame_orientation>ENU</world_frame_orientation>
+      <latitude_deg>37.386</latitude_deg>
+      <longitude_deg>-122.083</longitude_deg>
+      <elevation>10.5</elevation>
+      <heading_deg>90</heading_deg>
+    </spherical_coordinates>
+
+    <!-- GUI -->
+    <gui fullscreen='false'>
+      <plugin name='gui_plugin' filename='libGuiPlugin.so'>
+        <property>value</property>
+      </plugin>
+    </gui>
+
+    <!-- ==================== GROUND PLANE ==================== -->
+    <model name='ground_plane'>
+      <static>true</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>200 200</size>
+            </plane>
+          </geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0xffff</collide_bitmask>
+              <collide_without_contact>false</collide_without_contact>
+              <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+              <category_bitmask>0x00ff</category_bitmask>
+              <poissons_ratio>0.3</poissons_ratio>
+              <elastic_modulus>1e8</elastic_modulus>
+            </contact>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+                <fdir1>1 0 0</fdir1>
+                <slip1>0.01</slip1>
+                <slip2>0.01</slip2>
+              </ode>
+              <bullet>
+                <friction>0.8</friction>
+                <friction2>0.6</friction2>
+                <rolling_friction>0.01</rolling_friction>
+              </bullet>
+              <torsional>
+                <coefficient>0.5</coefficient>
+                <use_patch_radius>true</use_patch_radius>
+                <patch_radius>0.05</patch_radius>
+                <surface_radius>0.02</surface_radius>
+                <ode>
+                  <slip>0.001</slip>
+                </ode>
+              </torsional>
+            </friction>
+            <bounce>
+              <restitution_coefficient>0.5</restitution_coefficient>
+              <threshold>1000</threshold>
+            </bounce>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>200 200</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>0 0 0 1</emissive>
+            <lighting>true</lighting>
+            <double_sided>false</double_sided>
+            <shininess>30</shininess>
+          </material>
+          <cast_shadows>false</cast_shadows>
+          <transparency>0</transparency>
+          <laser_retro>50.0</laser_retro>
+          <visibility_flags>1</visibility_flags>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ==================== ALL GEOMETRY SHAPES MODEL ==================== -->
+    <model name='geometry_showcase'>
+      <static>true</static>
+      <self_collide>false</self_collide>
+      <pose>5 0 0 0 0 0</pose>
+
+      <link name='box_link'>
+        <pose>0 0 0.5 0 0 0</pose>
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.167</ixx><iyy>0.167</iyy><izz>0.167</izz>
+            <ixy>0.001</ixy><ixz>0.002</ixz><iyz>0.003</iyz>
+          </inertia>
+        </inertial>
+        <visual name='box_visual'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <material>
+            <ambient>0.8 0.2 0.2 1</ambient>
+            <diffuse>0.8 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+        <collision name='box_collision'>
+          <geometry><box><size>1 1 1</size></box></geometry>
+        </collision>
+      </link>
+
+      <link name='sphere_link'>
+        <pose>2 0 0.5 0 0 0</pose>
+        <visual name='sphere_visual'>
+          <geometry><sphere><radius>0.5</radius></sphere></geometry>
+        </visual>
+        <collision name='sphere_collision'>
+          <geometry><sphere><radius>0.5</radius></sphere></geometry>
+        </collision>
+      </link>
+
+      <link name='cylinder_link'>
+        <pose>4 0 0.5 0 0 0</pose>
+        <visual name='cylinder_visual'>
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='capsule_link'>
+        <pose>6 0 0.5 0 0 0</pose>
+        <visual name='capsule_visual'>
+          <geometry>
+            <capsule>
+              <radius>0.2</radius>
+              <length>0.8</length>
+            </capsule>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='ellipsoid_link'>
+        <pose>8 0 0.5 0 0 0</pose>
+        <visual name='ellipsoid_visual'>
+          <geometry>
+            <ellipsoid>
+              <radii>0.5 0.3 0.2</radii>
+            </ellipsoid>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='mesh_link'>
+        <pose>10 0 0 0 0 0</pose>
+        <visual name='mesh_visual'>
+          <geometry>
+            <mesh optimization='convex_decomposition'>
+              <uri>model://my_robot/meshes/body.dae</uri>
+              <submesh>
+                <name>wheel</name>
+                <center>true</center>
+              </submesh>
+              <scale>0.5 0.5 0.5</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='heightmap_link'>
+        <pose>12 0 0 0 0 0</pose>
+        <visual name='heightmap_visual'>
+          <geometry>
+            <heightmap>
+              <uri>file://media/terrain.png</uri>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+              <texture>
+                <diffuse>file://media/dirt.png</diffuse>
+                <normal>file://media/dirt_normal.png</normal>
+                <size>10</size>
+              </texture>
+              <texture>
+                <diffuse>file://media/grass.png</diffuse>
+                <normal>file://media/grass_normal.png</normal>
+                <size>20</size>
+              </texture>
+              <blend>
+                <min_height>5</min_height>
+                <fade_dist>2</fade_dist>
+              </blend>
+            </heightmap>
+          </geometry>
+        </visual>
+      </link>
+
+      <frame name='showcase_origin' attached_to='box_link'>
+        <pose>0 0 -0.5 0 0 0</pose>
+      </frame>
+    </model>
+
+    <!-- ==================== ROBOT WITH JOINTS, SENSORS ==================== -->
+    <model name='sensor_robot'>
+      <pose>0 5 0.25 0 0 0</pose>
+      <self_collide>true</self_collide>
+
+      <link name='base'>
+        <self_collide>true</self_collide>
+        <must_be_base_link>false</must_be_base_link>
+        <velocity_decay>
+          <linear>0.01</linear>
+          <angular>0.02</angular>
+        </velocity_decay>
+        <inertial auto='true'>
+          <mass>10</mass>
+          <pose>0 0 0 0 0 0</pose>
+          <inertia>
+            <ixx>0.833</ixx><iyy>0.833</iyy><izz>0.833</izz>
+            <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <enable_wind>true</enable_wind>
+        <enable_gravity>true</enable_gravity>
+        <kinematic>false</kinematic>
+        <collision name='base_collision'>
+          <density>2700</density>
+          <laser_retro>80</laser_retro>
+          <max_contacts>15</max_contacts>
+          <geometry>
+            <box><size>1 0.5 0.25</size></box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>0.8</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='base_visual'>
+          <meta>
+            <layer>2</layer>
+          </meta>
+          <geometry>
+            <box><size>1 0.5 0.25</size></box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.8 1</ambient>
+            <diffuse>0.2 0.2 0.8 1</diffuse>
+            <specular>0.5 0.5 0.5 1</specular>
+            <shininess>50</shininess>
+            <pbr>
+              <metal>
+                <albedo_map>textures/base_albedo.png</albedo_map>
+                <normal_map type='tangent'>textures/base_normal.png</normal_map>
+                <roughness_map>textures/base_roughness.png</roughness_map>
+                <metalness_map>textures/base_metalness.png</metalness_map>
+                <metalness>0.7</metalness>
+                <roughness>0.3</roughness>
+                <environment_map>textures/env.dds</environment_map>
+                <emissive_map>textures/base_emissive.png</emissive_map>
+                <light_map uv_set='1'>textures/base_lightmap.png</light_map>
+              </metal>
+            </pbr>
+          </material>
+          <cast_shadows>true</cast_shadows>
+          <transparency>0.1</transparency>
+          <laser_retro>100.0</laser_retro>
+          <visibility_flags>3</visibility_flags>
+        </visual>
+
+        <!-- Camera sensor -->
+        <sensor name='front_camera' type='camera'>
+          <pose>0.5 0 0.15 0 0 0</pose>
+          <update_rate>30</update_rate>
+          <topic>/robot/camera</topic>
+          <frame_id>camera_optical_frame</frame_id>
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <enable_metrics>false</enable_metrics>
+          <camera name='rgb_cam'>
+            <horizontal_fov>1.396</horizontal_fov>
+            <image>
+              <width>1920</width>
+              <height>1080</height>
+              <format>R8G8B8</format>
+              <anti_aliasing>8</anti_aliasing>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>300</far>
+            </clip>
+            <depth_camera>
+              <clip>
+                <near>0.1</near>
+                <far>50</far>
+              </clip>
+            </depth_camera>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+            <save enabled='true'>
+              <path>/tmp/camera_frames</path>
+            </save>
+            <visibility_mask>0xFFFF</visibility_mask>
+            <triggered>true</triggered>
+            <trigger_topic>/camera/trigger</trigger_topic>
+            <camera_info_topic>/camera/info</camera_info_topic>
+            <optical_frame_id>optical_frame</optical_frame_id>
+            <distortion>
+              <k1>0.1</k1>
+              <k2>0.2</k2>
+              <k3>0.3</k3>
+              <p1>0.01</p1>
+              <p2>0.02</p2>
+              <center>0.5 0.5</center>
+            </distortion>
+            <lens>
+              <type>stereographic</type>
+              <scale_to_hfov>true</scale_to_hfov>
+              <cutoff_angle>1.5707</cutoff_angle>
+              <env_texture_size>512</env_texture_size>
+              <intrinsics>
+                <fx>960</fx>
+                <fy>960</fy>
+                <cx>960</cx>
+                <cy>540</cy>
+                <s>0</s>
+              </intrinsics>
+            </lens>
+          </camera>
+        </sensor>
+
+        <!-- Depth camera sensor -->
+        <sensor name='depth_cam' type='depth_camera'>
+          <pose>0.5 0.05 0.15 0 0 0</pose>
+          <update_rate>15</update_rate>
+          <camera name='depth'>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R_FLOAT32</format>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>10</far>
+            </clip>
+          </camera>
+        </sensor>
+
+        <!-- IMU sensor with noise -->
+        <sensor name='body_imu' type='imu'>
+          <pose>0 0 0.05 0 0 0</pose>
+          <update_rate>200</update_rate>
+          <imu>
+            <linear_acceleration>
+              <x><noise>
+                <type>gaussian</type>
+                <mean>0</mean>
+                <stddev>0.01</stddev>
+                <bias_mean>0.001</bias_mean>
+                <bias_stddev>0.0001</bias_stddev>
+                <dynamic_bias_stddev>0.00002</dynamic_bias_stddev>
+                <dynamic_bias_correlation_time>300</dynamic_bias_correlation_time>
+              </noise></x>
+              <y><noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise></y>
+              <z><noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise></z>
+            </linear_acceleration>
+            <angular_velocity>
+              <x><noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise></x>
+              <y><noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise></y>
+              <z><noise><type>gaussian</type><mean>0</mean><stddev>0.005</stddev></noise></z>
+            </angular_velocity>
+            <orientation_reference_frame>
+              <localization>ENU</localization>
+              <custom_rpy parent_frame='world'>0 0 0</custom_rpy>
+              <grav_dir_x parent_frame='world'>1 0 0</grav_dir_x>
+            </orientation_reference_frame>
+            <enable_orientation>true</enable_orientation>
+          </imu>
+        </sensor>
+
+        <!-- GPU Lidar sensor -->
+        <sensor name='lidar_360' type='gpu_lidar'>
+          <pose>0 0 0.3 0 0 0</pose>
+          <update_rate>10</update_rate>
+          <topic>/robot/lidar</topic>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>640</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>16</samples>
+                <resolution>1</resolution>
+                <min_angle>-0.2618</min_angle>
+                <max_angle>0.2618</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.08</min>
+              <max>100.0</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.02</stddev>
+            </noise>
+            <visibility_mask>0xFFFF</visibility_mask>
+          </lidar>
+        </sensor>
+
+        <!-- Force-torque sensor -->
+        <sensor name='wrist_ft' type='force_torque'>
+          <update_rate>500</update_rate>
+          <force_torque>
+            <frame>child</frame>
+            <measure_direction>child_to_parent</measure_direction>
+            <force>
+              <x><noise><type>gaussian</type><mean>0</mean><stddev>0.1</stddev></noise></x>
+              <y><noise><type>gaussian</type><mean>0</mean><stddev>0.1</stddev></noise></y>
+              <z><noise><type>gaussian</type><mean>0</mean><stddev>0.1</stddev></noise></z>
+            </force>
+            <torque>
+              <x><noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise></x>
+              <y><noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise></y>
+              <z><noise><type>gaussian</type><mean>0</mean><stddev>0.01</stddev></noise></z>
+            </torque>
+          </force_torque>
+        </sensor>
+
+        <!-- Contact sensor -->
+        <sensor name='bumper' type='contact'>
+          <update_rate>100</update_rate>
+        </sensor>
+
+        <!-- Altimeter sensor with noise -->
+        <sensor name='altitude' type='altimeter'>
+          <update_rate>20</update_rate>
+          <altimeter>
+            <vertical_position>
+              <noise>
+                <type>gaussian</type>
+                <mean>0</mean>
+                <stddev>0.1</stddev>
+              </noise>
+            </vertical_position>
+            <vertical_velocity>
+              <noise>
+                <type>gaussian</type>
+                <mean>0</mean>
+                <stddev>0.02</stddev>
+              </noise>
+            </vertical_velocity>
+          </altimeter>
+        </sensor>
+
+        <!-- Air pressure sensor -->
+        <sensor name='baro' type='air_pressure'>
+          <update_rate>50</update_rate>
+          <air_pressure>
+            <reference_altitude>100</reference_altitude>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>10</stddev>
+            </noise>
+          </air_pressure>
+        </sensor>
+
+        <!-- Magnetometer sensor -->
+        <sensor name='mag' type='magnetometer'>
+          <update_rate>50</update_rate>
+          <magnetometer>
+            <x><noise><type>gaussian</type><mean>0</mean><stddev>0.001</stddev></noise></x>
+            <y><noise><type>gaussian</type><mean>0</mean><stddev>0.001</stddev></noise></y>
+            <z><noise><type>gaussian</type><mean>0</mean><stddev>0.001</stddev></noise></z>
+          </magnetometer>
+        </sensor>
+
+        <!-- NavSat (GPS) sensor -->
+        <sensor name='gps' type='navsat'>
+          <update_rate>5</update_rate>
+          <navsat>
+            <position_sensing>
+              <horizontal>
+                <noise><type>gaussian</type><mean>0</mean><stddev>0.5</stddev></noise>
+              </horizontal>
+              <vertical>
+                <noise><type>gaussian</type><mean>0</mean><stddev>1.0</stddev></noise>
+              </vertical>
+            </position_sensing>
+            <velocity_sensing>
+              <horizontal>
+                <noise><type>gaussian</type><mean>0</mean><stddev>0.05</stddev></noise>
+              </horizontal>
+              <vertical>
+                <noise><type>gaussian</type><mean>0</mean><stddev>0.1</stddev></noise>
+              </vertical>
+            </velocity_sensing>
+          </navsat>
+        </sensor>
+
+        <!-- Link-attached light -->
+        <light name='headlight' type='spot'>
+          <pose>0.5 0 0.1 0 0 0</pose>
+          <cast_shadows>true</cast_shadows>
+          <diffuse>1 1 0.9 1</diffuse>
+          <specular>1 1 1 1</specular>
+          <intensity>2.5</intensity>
+          <attenuation>
+            <range>30</range>
+            <constant>0.1</constant>
+            <linear>0.01</linear>
+            <quadratic>0.001</quadratic>
+          </attenuation>
+          <direction>1 0 -0.2</direction>
+          <spot>
+            <inner_angle>0.3</inner_angle>
+            <outer_angle>0.6</outer_angle>
+            <falloff>1.0</falloff>
+          </spot>
+        </light>
+      </link>
+
+      <!-- Wheel links -->
+      <link name='left_wheel'>
+        <pose>-0.3 0.3 -0.1 -1.5708 0 0</pose>
+        <inertial><mass>1</mass></inertial>
+        <collision name='collision'>
+          <geometry>
+            <cylinder><radius>0.15</radius><length>0.05</length></cylinder>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <cylinder><radius>0.15</radius><length>0.05</length></cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='right_wheel'>
+        <pose>-0.3 -0.3 -0.1 -1.5708 0 0</pose>
+        <inertial><mass>1</mass></inertial>
+        <collision name='collision'>
+          <geometry>
+            <cylinder><radius>0.15</radius><length>0.05</length></cylinder>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <cylinder><radius>0.15</radius><length>0.05</length></cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name='caster'>
+        <pose>0.35 0 -0.125 0 0 0</pose>
+        <inertial><mass>0.5</mass></inertial>
+        <collision name='collision'>
+          <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry><sphere><radius>0.05</radius></sphere></geometry>
+        </visual>
+      </link>
+
+      <!-- Revolute joints with full axis config -->
+      <joint name='left_wheel_joint' type='revolute'>
+        <parent>base</parent>
+        <child>left_wheel</child>
+        <axis>
+          <xyz expressed_in='__model__'>0 0 1</xyz>
+          <limit>
+            <lower>-1e16</lower>
+            <upper>1e16</upper>
+            <effort>50</effort>
+            <velocity>20</velocity>
+            <stiffness>1e8</stiffness>
+            <dissipation>1.0</dissipation>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0.05</friction>
+            <spring_reference>0</spring_reference>
+            <spring_stiffness>0</spring_stiffness>
+          </dynamics>
+        </axis>
+      </joint>
+
+      <joint name='right_wheel_joint' type='revolute'>
+        <parent>base</parent>
+        <child>right_wheel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>-1e16</lower>
+            <upper>1e16</upper>
+            <effort>50</effort>
+            <velocity>20</velocity>
+          </limit>
+          <dynamics>
+            <damping>0.1</damping>
+            <friction>0.05</friction>
+          </dynamics>
+        </axis>
+      </joint>
+
+      <!-- Ball joint -->
+      <joint name='caster_joint' type='ball'>
+        <parent>base</parent>
+        <child>caster</child>
+      </joint>
+
+      <!-- Fixed joint -->
+      <joint name='sensor_mount' type='fixed'>
+        <parent>base</parent>
+        <child>base</child>
+      </joint>
+
+      <!-- Prismatic joint -->
+      <joint name='lift_joint' type='prismatic'>
+        <parent>base</parent>
+        <child>caster</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <lower>0</lower>
+            <upper>0.5</upper>
+            <effort>100</effort>
+          </limit>
+        </axis>
+      </joint>
+
+      <!-- Screw joint -->
+      <joint name='screw_joint' type='screw'>
+        <parent>base</parent>
+        <child>left_wheel</child>
+        <screw_thread_pitch>0.01</screw_thread_pitch>
+        <thread_pitch>628.318</thread_pitch>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <!-- Named frames -->
+      <frame name='camera_optical' attached_to='base'>
+        <pose relative_to='base'>0.5 0 0.15 -1.5708 0 -1.5708</pose>
+      </frame>
+
+      <frame name='imu_frame' attached_to='base'>
+        <pose>0 0 0.05 0 0 0</pose>
+      </frame>
+
+      <!-- Plugins -->
+      <plugin name='diff_drive' filename='libDiffDrive.so'>
+        <left_joint>left_wheel_joint</left_joint>
+        <right_joint>right_wheel_joint</right_joint>
+        <wheel_separation>0.6</wheel_separation>
+        <wheel_radius>0.15</wheel_radius>
+      </plugin>
+
+      <plugin name='joint_controller' filename='libJointController.so'>
+        <joint_name>lift_joint</joint_name>
+      </plugin>
+    </model>
+
+    <!-- ==================== NESTED MODEL ==================== -->
+    <model name='warehouse'>
+      <static>true</static>
+      <pose>-10 0 0 0 0 0</pose>
+
+      <link name='floor'>
+        <visual name='visual'>
+          <geometry><box><size>20 20 0.1</size></box></geometry>
+        </visual>
+      </link>
+
+      <!-- Nested sub-model -->
+      <model name='shelf_unit'>
+        <pose>0 0 0.5 0 0 0</pose>
+        <link name='shelf'>
+          <visual name='visual'>
+            <geometry><box><size>2 0.5 1</size></box></geometry>
+          </visual>
+        </link>
+      </model>
+    </model>
+
+    <!-- ==================== LIGHTS ==================== -->
+
+    <!-- Directional light (sun) -->
+    <light name='sun' type='directional'>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1.0</intensity>
+      <diffuse>0.9 0.9 0.85 1</diffuse>
+      <specular>0.3 0.3 0.3 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+    </light>
+
+    <!-- Point light -->
+    <light name='lamp' type='point'>
+      <pose>3 3 3 0 0 0</pose>
+      <cast_shadows>false</cast_shadows>
+      <diffuse>1 0.95 0.8 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <intensity>1.5</intensity>
+      <attenuation>
+        <range>20</range>
+        <constant>0.5</constant>
+        <linear>0.1</linear>
+        <quadratic>0.01</quadratic>
+      </attenuation>
+    </light>
+
+    <!-- Spot light -->
+    <light name='spotlight' type='spot'>
+      <pose>0 0 5 0 0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>1 1 1 1</specular>
+      <intensity>3.0</intensity>
+      <direction>0 0 -1</direction>
+      <attenuation>
+        <range>50</range>
+        <constant>0.1</constant>
+        <linear>0.01</linear>
+        <quadratic>0.005</quadratic>
+      </attenuation>
+      <spot>
+        <inner_angle>0.2</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.0</falloff>
+      </spot>
+    </light>
+
+    <!-- ==================== ACTOR ==================== -->
+    <actor name='walking_person'>
+      <pose>2 -3 0 0 0 0</pose>
+      <skin>
+        <filename>model://person/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+      </skin>
+      <animation name='walk'>
+        <filename>model://person/meshes/walking.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>true</interpolate_x>
+      </animation>
+      <animation name='idle'>
+        <filename>model://person/meshes/idle.dae</filename>
+        <scale>1.0</scale>
+        <interpolate_x>false</interpolate_x>
+      </animation>
+      <script>
+        <loop>true</loop>
+        <delay_start>0</delay_start>
+        <auto_start>true</auto_start>
+        <trajectory id='0' type='walk'>
+          <waypoint>
+            <time>0</time>
+            <pose>2 -3 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>5</time>
+            <pose>4 -3 0 0 0 0</pose>
+          </waypoint>
+          <waypoint>
+            <time>10</time>
+            <pose>4 -1 0 0 0 1.5708</pose>
+          </waypoint>
+        </trajectory>
+      </script>
+      <plugin name='actor_plugin' filename='libFollowActor.so'>
+        <target>sensor_robot</target>
+      </plugin>
+    </actor>
+
+    <!-- ==================== WORLD-LEVEL FRAMES ==================== -->
+    <frame name='world_origin'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+
+  </world>
+</sdf>

@@ -40,6 +40,18 @@ namespace SDFormat
         /// <summary>Whether the link is kinematic only.</summary>
         public bool Kinematic { get; set; }
 
+        /// <summary>Whether the link can self-collide.</summary>
+        public bool SelfCollide { get; set; }
+
+        /// <summary>Whether the link must be a base link (6DOF).</summary>
+        public bool MustBeBaseLink { get; set; }
+
+        /// <summary>Linear velocity decay damping.</summary>
+        public double VelocityDecayLinear { get; set; }
+
+        /// <summary>Angular velocity decay damping.</summary>
+        public double VelocityDecayAngular { get; set; }
+
         /// <summary>Visual elements.</summary>
         public List<Visual> Visuals { get; } = new();
 
@@ -57,6 +69,11 @@ namespace SDFormat
 
         /// <summary>Projectors.</summary>
         public List<Element> Projectors { get; } = new();
+
+        /// <summary>Battery name.</summary>
+        public string BatteryName { get; set; } = string.Empty;
+        /// <summary>Battery voltage.</summary>
+        public double BatteryVoltage { get; set; }
 
         // ---- Visual accessors ----
         public int VisualCount => Visuals.Count;
@@ -149,10 +166,39 @@ namespace SDFormat
             var kinematic = sdf.FindElement("kinematic");
             if (kinematic?.Value != null) Kinematic = kinematic.Value.BoolValue;
 
+            // Self-collide
+            var selfCollide = sdf.FindElement("self_collide");
+            if (selfCollide?.Value != null) SelfCollide = selfCollide.Value.BoolValue;
+
+            // Must be base link
+            var mustBeBase = sdf.FindElement("must_be_base_link");
+            if (mustBeBase?.Value != null) MustBeBaseLink = mustBeBase.Value.BoolValue;
+
+            // Velocity decay
+            var velDecay = sdf.FindElement("velocity_decay");
+            if (velDecay != null)
+            {
+                var linear = velDecay.FindElement("linear");
+                if (linear?.Value != null) VelocityDecayLinear = linear.Value.DoubleValue;
+                var angular = velDecay.FindElement("angular");
+                if (angular?.Value != null) VelocityDecayAngular = angular.Value.DoubleValue;
+            }
+
             // Inertial
             if (sdf.HasElement("inertial"))
             {
                 var inertialElem = sdf.FindElement("inertial")!;
+
+                // Auto inertia
+                var autoAttr = inertialElem.GetAttribute("auto");
+                if (autoAttr != null) AutoInertia = autoAttr.BoolValue;
+
+                var densityElem = inertialElem.FindElement("density");
+                if (densityElem?.Value != null) Density = densityElem.Value.DoubleValue;
+
+                var autoParamsElem = inertialElem.FindElement("auto_inertia_params");
+                if (autoParamsElem != null) AutoInertiaParams = autoParamsElem;
+
                 var mass = inertialElem.FindElement("mass");
                 if (mass?.Value != null) Inertial.Mass = mass.Value.DoubleValue;
 
@@ -216,6 +262,32 @@ namespace SDFormat
                 errors.AddRange(light.Load(lightElem));
                 Lights.Add(light);
                 lightElem = lightElem.GetNextElement("light");
+            }
+
+            // Particle emitters (stored as raw elements)
+            var peElem = sdf.FindElement("particle_emitter");
+            while (peElem != null)
+            {
+                ParticleEmitters.Add(peElem);
+                peElem = peElem.GetNextElement("particle_emitter");
+            }
+
+            // Projectors (stored as raw elements)
+            var projElem = sdf.FindElement("projector");
+            while (projElem != null)
+            {
+                Projectors.Add(projElem);
+                projElem = projElem.GetNextElement("projector");
+            }
+
+            // Battery
+            var batteryElem = sdf.FindElement("battery");
+            if (batteryElem != null)
+            {
+                var battNameAttr = batteryElem.GetAttribute("name");
+                if (battNameAttr != null) BatteryName = battNameAttr.GetAsString();
+                var voltageElem = batteryElem.FindElement("voltage");
+                if (voltageElem?.Value != null) BatteryVoltage = voltageElem.Value.DoubleValue;
             }
 
             return errors;

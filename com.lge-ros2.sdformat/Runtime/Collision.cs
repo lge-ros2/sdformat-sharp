@@ -21,6 +21,12 @@ namespace SDFormat
         /// <summary>Density (kg/m^3).</summary>
         public double Density { get; set; } = DefaultDensity;
 
+        /// <summary>Laser retro intensity.</summary>
+        public double LaserRetro { get; set; }
+
+        /// <summary>Maximum contacts.</summary>
+        public int MaxContacts { get; set; } = 10;
+
         /// <summary>The geometry shape.</summary>
         public Geometry Geom { get; set; } = new();
 
@@ -38,6 +44,18 @@ namespace SDFormat
 
             var nameAttr = sdf.GetAttribute("name");
             if (nameAttr != null) Name = nameAttr.GetAsString();
+
+            var densityElem = sdf.FindElement("density");
+            if (densityElem?.Value != null) Density = densityElem.Value.DoubleValue;
+
+            var laserRetroElem = sdf.FindElement("laser_retro");
+            if (laserRetroElem?.Value != null) LaserRetro = laserRetroElem.Value.DoubleValue;
+
+            var maxContactsElem = sdf.FindElement("max_contacts");
+            if (maxContactsElem?.Value != null) MaxContacts = maxContactsElem.Value.IntValue;
+
+            var autoInertiaElem = sdf.FindElement("auto_inertia_params");
+            if (autoInertiaElem != null) AutoInertiaParams = autoInertiaElem;
 
             var poseElem = sdf.FindElement("pose");
             if (poseElem?.Value != null)

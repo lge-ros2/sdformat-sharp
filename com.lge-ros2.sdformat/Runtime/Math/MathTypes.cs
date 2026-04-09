@@ -156,6 +156,7 @@ namespace SDFormat.Math
         }
 
         public SurfaceType Surface { get; set; } = SurfaceType.EarthWgs84;
+        public string WorldFrameOrientation { get; set; } = "ENU";
         public double LatitudeDeg { get; set; }
         public double LongitudeDeg { get; set; }
         public double ElevationM { get; set; }
