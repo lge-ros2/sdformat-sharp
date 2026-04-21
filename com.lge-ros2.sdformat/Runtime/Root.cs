@@ -130,14 +130,19 @@ namespace SDFormat
                 return errors;
             }
 
-            errors.AddRange(LoadFromElement(element));
+            errors.AddRange(LoadFromElement(element, config));
             return errors;
         }
 
         /// <summary>
         /// Load from a pre-parsed Element tree.
         /// </summary>
-        public List<SdfError> LoadFromElement(Element sdf)
+        public List<SdfError> LoadFromElement(Element sdf) => LoadFromElement(sdf, null);
+
+        /// <summary>
+        /// Load from a pre-parsed Element tree with parser configuration.
+        /// </summary>
+        public List<SdfError> LoadFromElement(Element sdf, ParserConfig? config)
         {
             var errors = new List<SdfError>();
             Element = sdf;
@@ -151,7 +156,7 @@ namespace SDFormat
             while (worldElem != null)
             {
                 var world = new World();
-                errors.AddRange(world.Load(worldElem));
+                errors.AddRange(world.Load(worldElem, config));
                 Worlds.Add(world);
                 worldElem = worldElem.GetNextElement("world");
             }
@@ -160,7 +165,7 @@ namespace SDFormat
             if (sdf.HasElement("model"))
             {
                 StandaloneModel = new Model();
-                errors.AddRange(StandaloneModel.Load(sdf.FindElement("model")!));
+                errors.AddRange(StandaloneModel.Load(sdf.FindElement("model")!, config));
             }
 
             // Load standalone light

@@ -52,6 +52,12 @@ namespace SDFormat
         /// <summary>Plugins.</summary>
         public List<Plugin> Plugins { get; } = new();
 
+        /// <summary>Include elements (before resolution).</summary>
+        public List<Include> Includes { get; } = new();
+
+        /// <summary>Grippers.</summary>
+        public List<Gripper> Grippers { get; } = new();
+
         // ---- Link accessors ----
         public int LinkCount => Links.Count;
         public Link? LinkByIndex(int index) =>
@@ -132,7 +138,10 @@ namespace SDFormat
         }
 
         /// <summary>Load from an SDF element.</summary>
-        public List<SdfError> Load(Element sdf)
+        public List<SdfError> Load(Element sdf) => Load(sdf, null);
+
+        /// <summary>Load from an SDF element with parser configuration for include resolution.</summary>
+        public List<SdfError> Load(Element sdf, ParserConfig? config)
         {
             var errors = new List<SdfError>();
             Element = sdf;
@@ -201,7 +210,7 @@ namespace SDFormat
             while (modelElem != null)
             {
                 var model = new Model();
-                errors.AddRange(model.Load(modelElem));
+                errors.AddRange(model.Load(modelElem, config));
                 Models.Add(model);
                 modelElem = modelElem.GetNextElement("model");
             }
@@ -214,6 +223,30 @@ namespace SDFormat
                 errors.AddRange(plugin.Load(pluginElem));
                 Plugins.Add(plugin);
                 pluginElem = pluginElem.GetNextElement("plugin");
+            }
+
+            // Load grippers
+            var gripperElem = sdf.FindElement("gripper");
+            while (gripperElem != null)
+            {
+                var gripper = new Gripper();
+                errors.AddRange(gripper.Load(gripperElem));
+                Grippers.Add(gripper);
+                gripperElem = gripperElem.GetNextElement("gripper");
+            }
+
+            // Load includes
+            var includeElem = sdf.FindElement("include");
+            while (includeElem != null)
+            {
+                var (inc, incErrors) = Include.Load(includeElem);
+                errors.AddRange(incErrors);
+                Includes.Add(inc);
+
+                if (config != null)
+                    errors.AddRange(inc.ResolveAndApply(this, config));
+
+                includeElem = includeElem.GetNextElement("include");
             }
 
             return errors;

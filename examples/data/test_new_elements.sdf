@@ -1,0 +1,323 @@
+<?xml version="1.0" ?>
+<sdf version="1.12">
+  <world name="test_new_elements">
+    <gravity>0 0 -9.81</gravity>
+
+    <!-- Physics with engine-specific params -->
+    <physics name="ode_physics" type="ode" default="true">
+      <max_step_size>0.002</max_step_size>
+      <real_time_factor>1.5</real_time_factor>
+      <real_time_update_rate>500</real_time_update_rate>
+      <max_contacts>30</max_contacts>
+      <ode>
+        <solver>
+          <type>quick</type>
+          <iters>100</iters>
+          <sor>1.4</sor>
+          <precon_iters>10</precon_iters>
+        </solver>
+        <constraints>
+          <cfm>0.001</cfm>
+          <erp>0.3</erp>
+          <contact_max_correcting_vel>50</contact_max_correcting_vel>
+          <contact_surface_layer>0.002</contact_surface_layer>
+        </constraints>
+      </ode>
+    </physics>
+
+    <physics name="bullet_physics" type="bullet" default="false">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>75</iters>
+          <sor>1.2</sor>
+          <min_step_size>0.0002</min_step_size>
+        </solver>
+        <constraints>
+          <cfm>0.002</cfm>
+          <erp>0.25</erp>
+          <contact_surface_layer>0.003</contact_surface_layer>
+          <split_impulse>true</split_impulse>
+          <split_impulse_penetration_threshold>-0.02</split_impulse_penetration_threshold>
+        </constraints>
+      </bullet>
+    </physics>
+
+    <physics name="simbody_physics" type="simbody" default="false">
+      <max_step_size>0.001</max_step_size>
+      <simbody>
+        <accuracy>0.002</accuracy>
+        <max_transient_velocity>0.05</max_transient_velocity>
+        <contact>
+          <stiffness>2e8</stiffness>
+          <dissipation>200</dissipation>
+          <plastic_coef_restitution>0.6</plastic_coef_restitution>
+          <plastic_impact_velocity>0.4</plastic_impact_velocity>
+          <static_friction>0.8</static_friction>
+          <dynamic_friction>0.7</dynamic_friction>
+          <viscous_friction>0.1</viscous_friction>
+          <override_impact_capture_velocity>0.002</override_impact_capture_velocity>
+          <override_stiction_transition_velocity>0.003</override_stiction_transition_velocity>
+        </contact>
+      </simbody>
+    </physics>
+
+    <physics name="dart_physics" type="dart" default="false">
+      <max_step_size>0.001</max_step_size>
+      <dart>
+        <solver>
+          <solver_type>dantzig</solver_type>
+        </solver>
+        <collision_detector>bullet</collision_detector>
+      </dart>
+    </physics>
+
+    <!-- Road -->
+    <road name="main_road">
+      <width>7.5</width>
+      <point>0 0 0</point>
+      <point>100 0 0</point>
+      <point>200 50 0</point>
+      <material>
+        <ambient>0.3 0.3 0.3 1</ambient>
+        <diffuse>0.5 0.5 0.5 1</diffuse>
+      </material>
+    </road>
+
+    <!-- Population -->
+    <population name="tree_population">
+      <model_count>25</model_count>
+      <distribution>
+        <type>random</type>
+      </distribution>
+      <pose>50 50 0 0 0 0</pose>
+      <box>
+        <size>100 100 0.01</size>
+      </box>
+    </population>
+
+    <!-- State -->
+    <state world_name="test_new_elements">
+      <sim_time>10.5</sim_time>
+      <wall_time>12.3</wall_time>
+      <real_time>11.1</real_time>
+      <iterations>10500</iterations>
+      <insertions>
+        <model name="inserted_box"/>
+      </insertions>
+      <deletions>
+        <name>deleted_sphere</name>
+        <name>deleted_cylinder</name>
+      </deletions>
+      <model name="robot_state">
+        <pose>1 2 3 0.1 0.2 0.3</pose>
+        <scale>1.5 1.5 1.5</scale>
+        <joint name="joint1">
+          <angle>1.57</angle>
+          <angle>0.5</angle>
+        </joint>
+        <link name="base_link">
+          <pose>0 0 0.5 0 0 0</pose>
+          <velocity>0.1 0.2 0.3 0.01 0.02 0.03</velocity>
+          <acceleration>0 0 -9.81 0 0 0</acceleration>
+          <wrench>0 0 -98.1 0 0 0</wrench>
+        </link>
+      </model>
+      <light name="sun_state">
+        <pose>0 0 10 0 0 0</pose>
+      </light>
+    </state>
+
+    <!-- Model with grippers, gearbox joints, audio, fluid_added_mass -->
+    <model name="test_robot">
+      <static>false</static>
+
+      <!-- Gripper -->
+      <gripper name="left_gripper">
+        <grasp_check>
+          <min_contact_count>3</min_contact_count>
+          <attach_steps>30</attach_steps>
+        </grasp_check>
+        <gripper_link>finger_left</gripper_link>
+        <gripper_link>finger_right</gripper_link>
+        <palm_link>palm</palm_link>
+      </gripper>
+
+      <link name="base_link">
+        <!-- Audio sink -->
+        <audio_sink/>
+
+        <!-- Audio source -->
+        <audio_source>
+          <uri>file://sounds/motor.wav</uri>
+          <pitch>1.2</pitch>
+          <gain>0.8</gain>
+          <loop>true</loop>
+          <inner_angle>1.57</inner_angle>
+          <outer_angle>3.14</outer_angle>
+          <falloff>1.5</falloff>
+          <contact>
+            <collision>base_collision</collision>
+            <collision>arm_collision</collision>
+          </contact>
+        </audio_source>
+
+        <!-- Inertial with fluid_added_mass -->
+        <inertial auto="true">
+          <mass>10</mass>
+          <inertia>
+            <ixx>1.0</ixx>
+            <iyy>2.0</iyy>
+            <izz>3.0</izz>
+            <ixy>0.1</ixy>
+            <ixz>0.2</ixz>
+            <iyz>0.3</iyz>
+          </inertia>
+          <fluid_added_mass>
+            <xx>10.0</xx>
+            <xy>0.1</xy>
+            <xz>0.2</xz>
+            <xp>0.3</xp>
+            <xq>0.4</xq>
+            <xr>0.5</xr>
+            <yy>11.0</yy>
+            <yz>0.6</yz>
+            <yp>0.7</yp>
+            <yq>0.8</yq>
+            <yr>0.9</yr>
+            <zz>12.0</zz>
+            <zp>1.0</zp>
+            <zq>1.1</zq>
+            <zr>1.2</zr>
+            <pp>13.0</pp>
+            <pq>1.3</pq>
+            <pr>1.4</pr>
+            <qq>14.0</qq>
+            <qr>1.5</qr>
+            <rr>15.0</rr>
+          </fluid_added_mass>
+        </inertial>
+
+        <!-- Collision with ODE/Bullet contact + soft_contact -->
+        <collision name="base_collision">
+          <geometry><box><size>1 1 1</size></box></geometry>
+          <surface>
+            <contact>
+              <collide_bitmask>0xFF</collide_bitmask>
+              <ode>
+                <soft_cfm>0.01</soft_cfm>
+                <soft_erp>0.3</soft_erp>
+                <kp>1e10</kp>
+                <kd>2.0</kd>
+                <max_vel>0.1</max_vel>
+                <min_depth>0.002</min_depth>
+              </ode>
+              <bullet>
+                <soft_cfm>0.02</soft_cfm>
+                <soft_erp>0.25</soft_erp>
+                <kp>1e11</kp>
+                <kd>3.0</kd>
+                <split_impulse>false</split_impulse>
+                <split_impulse_penetration_threshold>-0.05</split_impulse_penetration_threshold>
+              </bullet>
+            </contact>
+            <soft_contact>
+              <dart>
+                <bone_attachment>50</bone_attachment>
+                <stiffness>200</stiffness>
+                <damping>20</damping>
+                <flesh_mass_fraction>0.1</flesh_mass_fraction>
+              </dart>
+            </soft_contact>
+          </surface>
+        </collision>
+
+        <!-- Visual with empty geometry -->
+        <visual name="empty_visual">
+          <geometry><empty/></geometry>
+        </visual>
+
+        <!-- Sensor: contact -->
+        <sensor name="contact_sensor" type="contact">
+          <contact>
+            <collision>base_collision</collision>
+            <topic>/contact_data</topic>
+          </contact>
+        </sensor>
+
+        <!-- Sensor: wireless_transmitter -->
+        <sensor name="wifi_tx" type="wireless_transmitter">
+          <transceiver>
+            <essid>my_network</essid>
+            <frequency>2412</frequency>
+            <gain>3.0</gain>
+            <power>15.5</power>
+            <sensitivity>-85</sensitivity>
+          </transceiver>
+        </sensor>
+      </link>
+
+      <link name="arm_link">
+        <!-- Geometry: image -->
+        <visual name="image_visual">
+          <geometry>
+            <image>
+              <uri>file://images/maze.png</uri>
+              <scale>0.5</scale>
+              <threshold>128</threshold>
+              <height>2.0</height>
+              <granularity>2</granularity>
+            </image>
+          </geometry>
+        </visual>
+
+        <!-- Geometry: mesh with convex_decomposition -->
+        <visual name="mesh_visual">
+          <geometry>
+            <mesh optimization="convex_decomposition">
+              <uri>model://robot/mesh.dae</uri>
+              <convex_decomposition>
+                <max_convex_hulls>32</max_convex_hulls>
+                <voxel_resolution>400000</voxel_resolution>
+              </convex_decomposition>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+
+      <!-- Joint with gearbox params -->
+      <joint name="gearbox_joint" type="gearbox">
+        <parent>base_link</parent>
+        <child>arm_link</child>
+        <gearbox_ratio>2.5</gearbox_ratio>
+        <gearbox_reference_body>world</gearbox_reference_body>
+        <physics>
+          <provide_feedback>true</provide_feedback>
+          <ode>
+            <cfm_damping>true</cfm_damping>
+            <implicit_spring_damper>true</implicit_spring_damper>
+            <fudge_factor>0.5</fudge_factor>
+            <cfm>0.01</cfm>
+            <erp>0.3</erp>
+            <bounce>0.1</bounce>
+            <max_force>100</max_force>
+            <velocity>5.0</velocity>
+            <limit>
+              <cfm>0.02</cfm>
+              <erp>0.25</erp>
+            </limit>
+            <suspension>
+              <cfm>0.03</cfm>
+              <erp>0.35</erp>
+            </suspension>
+          </ode>
+          <simbody>
+            <must_be_loop_joint>true</must_be_loop_joint>
+          </simbody>
+        </physics>
+      </joint>
+    </model>
+  </world>
+</sdf>

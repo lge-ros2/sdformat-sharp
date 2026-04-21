@@ -30,6 +30,12 @@ namespace SDFormat
         /// <summary>Young's modulus (Pa). Negative disables elastic contact.</summary>
         public double ElasticModulus { get; set; } = -1;
 
+        /// <summary>ODE-specific contact parameters.</summary>
+        public OdeContact? OdeParams { get; set; }
+
+        /// <summary>Bullet-specific contact parameters.</summary>
+        public BulletContact? BulletParams { get; set; }
+
         public List<SdfError> Load(Element sdf)
         {
             var errors = new List<SdfError>();
@@ -62,6 +68,20 @@ namespace SDFormat
             if (poisson?.Value != null) PoissonsRatio = poisson.Value.DoubleValue;
             var elastic = sdf.FindElement("elastic_modulus");
             if (elastic?.Value != null) ElasticModulus = elastic.Value.DoubleValue;
+
+            // ODE contact params
+            if (sdf.HasElement("ode"))
+            {
+                OdeParams = new OdeContact();
+                errors.AddRange(OdeParams.Load(sdf.FindElement("ode")!));
+            }
+
+            // Bullet contact params
+            if (sdf.HasElement("bullet"))
+            {
+                BulletParams = new BulletContact();
+                errors.AddRange(BulletParams.Load(sdf.FindElement("bullet")!));
+            }
 
             return errors;
         }
@@ -208,6 +228,7 @@ namespace SDFormat
         public Contact? ContactInfo { get; set; }
         public Friction? FrictionInfo { get; set; }
         public Bounce? BounceInfo { get; set; }
+        public DartSoftContact? SoftContact { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -229,6 +250,15 @@ namespace SDFormat
                 BounceInfo = new Bounce();
                 errors.AddRange(BounceInfo.Load(sdf.FindElement("bounce")!));
             }
+            if (sdf.HasElement("soft_contact"))
+            {
+                var softElem = sdf.FindElement("soft_contact")!;
+                if (softElem.HasElement("dart"))
+                {
+                    SoftContact = new DartSoftContact();
+                    errors.AddRange(SoftContact.Load(softElem.FindElement("dart")!));
+                }
+            }
 
             return errors;
         }
@@ -237,6 +267,90 @@ namespace SDFormat
         {
             var elem = new Element { Name = "surface" };
             return elem;
+        }
+    }
+
+    /// <summary>ODE-specific contact parameters.</summary>
+    public class OdeContact : SdfElement
+    {
+        public double SoftCfm { get; set; }
+        public double SoftErp { get; set; } = 0.2;
+        public double Kp { get; set; } = 1e12;
+        public double Kd { get; set; } = 1.0;
+        public double MaxVel { get; set; } = 0.01;
+        public double MinDepth { get; set; }
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+            var softCfm = sdf.FindElement("soft_cfm");
+            if (softCfm?.Value != null) SoftCfm = softCfm.Value.DoubleValue;
+            var softErp = sdf.FindElement("soft_erp");
+            if (softErp?.Value != null) SoftErp = softErp.Value.DoubleValue;
+            var kp = sdf.FindElement("kp");
+            if (kp?.Value != null) Kp = kp.Value.DoubleValue;
+            var kd = sdf.FindElement("kd");
+            if (kd?.Value != null) Kd = kd.Value.DoubleValue;
+            var maxVel = sdf.FindElement("max_vel");
+            if (maxVel?.Value != null) MaxVel = maxVel.Value.DoubleValue;
+            var minDepth = sdf.FindElement("min_depth");
+            if (minDepth?.Value != null) MinDepth = minDepth.Value.DoubleValue;
+            return errors;
+        }
+    }
+
+    /// <summary>Bullet-specific contact parameters.</summary>
+    public class BulletContact : SdfElement
+    {
+        public double SoftCfm { get; set; }
+        public double SoftErp { get; set; } = 0.2;
+        public double Kp { get; set; } = 1e12;
+        public double Kd { get; set; } = 1.0;
+        public bool SplitImpulse { get; set; } = true;
+        public double SplitImpulsePenetrationThreshold { get; set; } = -0.01;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+            var softCfm = sdf.FindElement("soft_cfm");
+            if (softCfm?.Value != null) SoftCfm = softCfm.Value.DoubleValue;
+            var softErp = sdf.FindElement("soft_erp");
+            if (softErp?.Value != null) SoftErp = softErp.Value.DoubleValue;
+            var kp = sdf.FindElement("kp");
+            if (kp?.Value != null) Kp = kp.Value.DoubleValue;
+            var kd = sdf.FindElement("kd");
+            if (kd?.Value != null) Kd = kd.Value.DoubleValue;
+            var splitImpulse = sdf.FindElement("split_impulse");
+            if (splitImpulse?.Value != null) SplitImpulse = splitImpulse.Value.BoolValue;
+            var splitThresh = sdf.FindElement("split_impulse_penetration_threshold");
+            if (splitThresh?.Value != null) SplitImpulsePenetrationThreshold = splitThresh.Value.DoubleValue;
+            return errors;
+        }
+    }
+
+    /// <summary>DART soft-contact parameters.</summary>
+    public class DartSoftContact : SdfElement
+    {
+        public double BoneAttachment { get; set; } = 100.0;
+        public double Stiffness { get; set; } = 100.0;
+        public double Damping { get; set; } = 10.0;
+        public double FleshMassFraction { get; set; } = 0.05;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+            var boneAttachment = sdf.FindElement("bone_attachment");
+            if (boneAttachment?.Value != null) BoneAttachment = boneAttachment.Value.DoubleValue;
+            var stiffness = sdf.FindElement("stiffness");
+            if (stiffness?.Value != null) Stiffness = stiffness.Value.DoubleValue;
+            var damping = sdf.FindElement("damping");
+            if (damping?.Value != null) Damping = damping.Value.DoubleValue;
+            var fleshMass = sdf.FindElement("flesh_mass_fraction");
+            if (fleshMass?.Value != null) FleshMassFraction = fleshMass.Value.DoubleValue;
+            return errors;
         }
     }
 }

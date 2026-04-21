@@ -75,6 +75,68 @@ namespace SDFormat
         }
     }
 
+    /// <summary>Contact sensor properties.</summary>
+    public class ContactSensor : SdfElement
+    {
+        /// <summary>Name of the collision element to monitor.</summary>
+        public string CollisionName { get; set; } = string.Empty;
+
+        /// <summary>Topic on which contact data is published.</summary>
+        public string Topic { get; set; } = string.Empty;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var collision = sdf.FindElement("collision");
+            if (collision?.Value != null) CollisionName = collision.Value.GetAsString();
+
+            var topic = sdf.FindElement("topic");
+            if (topic?.Value != null) Topic = topic.Value.GetAsString();
+
+            return errors;
+        }
+    }
+
+    /// <summary>Wireless transceiver sensor properties.</summary>
+    public class TransceiverSensor : SdfElement
+    {
+        /// <summary>ESSID of the wireless network.</summary>
+        public string Essid { get; set; } = string.Empty;
+
+        /// <summary>Frequency of operation (MHz).</summary>
+        public double Frequency { get; set; } = 2442.0;
+
+        /// <summary>Antenna gain (dBi).</summary>
+        public double Gain { get; set; } = 2.5;
+
+        /// <summary>Transmission power (dBm).</summary>
+        public double Power { get; set; } = 14.5;
+
+        /// <summary>Receiver sensitivity (dBm).</summary>
+        public double Sensitivity { get; set; } = -90.0;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var essid = sdf.FindElement("essid");
+            if (essid?.Value != null) Essid = essid.Value.GetAsString();
+            var frequency = sdf.FindElement("frequency");
+            if (frequency?.Value != null) Frequency = frequency.Value.DoubleValue;
+            var gain = sdf.FindElement("gain");
+            if (gain?.Value != null) Gain = gain.Value.DoubleValue;
+            var power = sdf.FindElement("power");
+            if (power?.Value != null) Power = power.Value.DoubleValue;
+            var sensitivity = sdf.FindElement("sensitivity");
+            if (sensitivity?.Value != null) Sensitivity = sensitivity.Value.DoubleValue;
+
+            return errors;
+        }
+    }
+
     /// <summary>Logical camera sensor properties.</summary>
     public class LogicalCameraSensor : SdfElement
     {
@@ -698,6 +760,8 @@ namespace SDFormat
         public NavSatSensor? NavSat { get; set; }
         public LogicalCameraSensor? LogicalCamera { get; set; }
         public SonarSensor? Sonar { get; set; }
+        public ContactSensor? ContactSensorData { get; set; }
+        public TransceiverSensor? Transceiver { get; set; }
 
         /// <summary>Plugins.</summary>
         public List<Plugin> Plugins { get; } = new();
@@ -895,6 +959,21 @@ namespace SDFormat
                     {
                         Sonar = new SonarSensor();
                         errors.AddRange(Sonar.Load(sdf.FindElement("sonar")!));
+                    }
+                    break;
+                case SensorType.Contact:
+                    if (sdf.HasElement("contact"))
+                    {
+                        ContactSensorData = new ContactSensor();
+                        errors.AddRange(ContactSensorData.Load(sdf.FindElement("contact")!));
+                    }
+                    break;
+                case SensorType.WirelessTransmitter:
+                case SensorType.WirelessReceiver:
+                    if (sdf.HasElement("transceiver"))
+                    {
+                        Transceiver = new TransceiverSensor();
+                        errors.AddRange(Transceiver.Load(sdf.FindElement("transceiver")!));
                     }
                     break;
             }

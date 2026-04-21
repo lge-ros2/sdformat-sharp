@@ -48,6 +48,9 @@ namespace SDFormat
         /// <summary>Polyline shapes (valid when Type == Polyline).</summary>
         public List<Polyline> PolylineShape { get; set; } = new();
 
+        /// <summary>Image shape (valid when Type == Image).</summary>
+        public ImageShape? ImageShapeData { get; set; }
+
         /// <summary>Load geometry from an SDF element.</summary>
         public List<SdfError> Load(Element sdf)
         {
@@ -120,6 +123,16 @@ namespace SDFormat
                     PolylineShape.Add(poly);
                     polyElem = polyElem.GetNextElement("polyline");
                 }
+            }
+            else if (sdf.HasElement("image"))
+            {
+                Type = GeometryType.Image;
+                ImageShapeData = new ImageShape();
+                errors.AddRange(ImageShapeData.Load(sdf.FindElement("image")!));
+            }
+            else if (sdf.HasElement("empty"))
+            {
+                Type = GeometryType.Empty;
             }
 
             return errors;

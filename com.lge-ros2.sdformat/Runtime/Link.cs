@@ -75,6 +75,15 @@ namespace SDFormat
         /// <summary>Battery voltage.</summary>
         public double BatteryVoltage { get; set; }
 
+        /// <summary>Whether an audio sink is present on this link.</summary>
+        public bool HasAudioSink { get; set; }
+
+        /// <summary>Audio sources attached to this link.</summary>
+        public List<AudioSource> AudioSources { get; } = new();
+
+        /// <summary>Fluid added mass matrix (6x6, stored as 21 unique upper-triangular values).</summary>
+        public double[]? FluidAddedMass { get; set; }
+
         // ---- Visual accessors ----
         public int VisualCount => Visuals.Count;
         public Visual? VisualByIndex(int index) =>
@@ -222,6 +231,26 @@ namespace SDFormat
                 var inertialPose = inertialElem.FindElement("pose");
                 if (inertialPose?.Value != null)
                     Inertial.Pose = inertialPose.Value.Pose3dValue;
+
+                // Fluid added mass (21 unique elements of 6x6 symmetric matrix)
+                var fluidAddedMass = inertialElem.FindElement("fluid_added_mass");
+                if (fluidAddedMass != null)
+                {
+                    FluidAddedMass = new double[21];
+                    string[] names = {
+                        "xx", "xy", "xz", "xp", "xq", "xr",
+                        "yy", "yz", "yp", "yq", "yr",
+                        "zz", "zp", "zq", "zr",
+                        "pp", "pq", "pr",
+                        "qq", "qr",
+                        "rr"
+                    };
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        var fam = fluidAddedMass.FindElement(names[i]);
+                        if (fam?.Value != null) FluidAddedMass[i] = fam.Value.DoubleValue;
+                    }
+                }
             }
 
             // Visuals
@@ -290,6 +319,20 @@ namespace SDFormat
                 if (voltageElem?.Value != null) BatteryVoltage = voltageElem.Value.DoubleValue;
             }
 
+            // Audio sink
+            if (sdf.HasElement("audio_sink"))
+                HasAudioSink = true;
+
+            // Audio sources
+            var audioSrcElem = sdf.FindElement("audio_source");
+            while (audioSrcElem != null)
+            {
+                var src = new AudioSource();
+                errors.AddRange(src.Load(audioSrcElem));
+                AudioSources.Add(src);
+                audioSrcElem = audioSrcElem.GetNextElement("audio_source");
+            }
+
             return errors;
         }
 
@@ -323,6 +366,75 @@ namespace SDFormat
                 elem.InsertElement(light.ToElement());
 
             return elem;
+        }
+    }
+
+    /// <summary>An audio source attached to a link.</summary>
+    public class AudioSource : SdfElement
+    {
+        /// <summary>URI of the audio file.</summary>
+        public string Uri { get; set; } = string.Empty;
+
+        /// <summary>Pitch of the audio source.</summary>
+        public double Pitch { get; set; } = 1.0;
+
+        /// <summary>Gain of the audio source.</summary>
+        public double Gain { get; set; } = 1.0;
+
+        /// <summary>Whether the audio loops.</summary>
+        public bool Loop { get; set; }
+
+        /// <summary>Inner angle of the audio cone (radians).</summary>
+        public double InnerAngle { get; set; }
+
+        /// <summary>Outer angle of the audio cone (radians).</summary>
+        public double OuterAngle { get; set; }
+
+        /// <summary>Falloff factor for distance-based attenuation.</summary>
+        public double Falloff { get; set; }
+
+        /// <summary>Contact surface names that trigger audio playback.</summary>
+        public List<string> ContactSurfaces { get; } = new();
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var uri = sdf.FindElement("uri");
+            if (uri?.Value != null) Uri = uri.Value.GetAsString();
+
+            var pitch = sdf.FindElement("pitch");
+            if (pitch?.Value != null) Pitch = pitch.Value.DoubleValue;
+
+            var gain = sdf.FindElement("gain");
+            if (gain?.Value != null) Gain = gain.Value.DoubleValue;
+
+            var loop = sdf.FindElement("loop");
+            if (loop?.Value != null) Loop = loop.Value.BoolValue;
+
+            var innerAngle = sdf.FindElement("inner_angle");
+            if (innerAngle?.Value != null) InnerAngle = innerAngle.Value.DoubleValue;
+
+            var outerAngle = sdf.FindElement("outer_angle");
+            if (outerAngle?.Value != null) OuterAngle = outerAngle.Value.DoubleValue;
+
+            var falloff = sdf.FindElement("falloff");
+            if (falloff?.Value != null) Falloff = falloff.Value.DoubleValue;
+
+            var contact = sdf.FindElement("contact");
+            if (contact != null)
+            {
+                var collisionElem = contact.FindElement("collision");
+                while (collisionElem != null)
+                {
+                    if (collisionElem.Value != null)
+                        ContactSurfaces.Add(collisionElem.Value.GetAsString());
+                    collisionElem = collisionElem.GetNextElement("collision");
+                }
+            }
+
+            return errors;
         }
     }
 }

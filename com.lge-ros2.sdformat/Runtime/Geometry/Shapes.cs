@@ -258,6 +258,9 @@ namespace SDFormat
         /// <summary>Optimization level (none, convex_decomposition, convex_hull).</summary>
         public string OptimizationStr { get; set; } = string.Empty;
 
+        /// <summary>Convex decomposition parameters (when optimization is convex_decomposition).</summary>
+        public ConvexDecomposition? ConvexDecomp { get; set; }
+
         public List<SdfError> Load(Element sdf)
         {
             var errors = new List<SdfError>();
@@ -279,6 +282,13 @@ namespace SDFormat
                 if (nameElem?.Value != null) Submesh = nameElem.Value.GetAsString();
                 var centerElem = submeshElem.FindElement("center");
                 if (centerElem?.Value != null) CenterSubmesh = centerElem.Value.BoolValue;
+            }
+
+            // Convex decomposition
+            if (sdf.HasElement("convex_decomposition"))
+            {
+                ConvexDecomp = new ConvexDecomposition();
+                errors.AddRange(ConvexDecomp.Load(sdf.FindElement("convex_decomposition")!));
             }
 
             return errors;
@@ -432,6 +442,63 @@ namespace SDFormat
                 }
                 pointElem = pointElem.GetNextElement("point");
             }
+            return errors;
+        }
+    }
+
+    /// <summary>Convex decomposition parameters for mesh optimization.</summary>
+    public class ConvexDecomposition : SdfElement
+    {
+        /// <summary>Maximum number of convex hulls to generate.</summary>
+        public uint MaxConvexHulls { get; set; } = 16;
+
+        /// <summary>Voxel resolution for decomposition.</summary>
+        public uint VoxelResolution { get; set; } = 200000;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+            var maxHulls = sdf.FindElement("max_convex_hulls");
+            if (maxHulls?.Value != null) MaxConvexHulls = (uint)maxHulls.Value.IntValue;
+            var voxelRes = sdf.FindElement("voxel_resolution");
+            if (voxelRes?.Value != null) VoxelResolution = (uint)voxelRes.Value.IntValue;
+            return errors;
+        }
+    }
+
+    /// <summary>Image-based geometry — extrudes boxes from a grayscale image.</summary>
+    public class ImageShape : SdfElement
+    {
+        /// <summary>URI of the grayscale image.</summary>
+        public string Uri { get; set; } = string.Empty;
+
+        /// <summary>Scale of the image in meters/pixel.</summary>
+        public double Scale { get; set; } = 1.0;
+
+        /// <summary>Grayscale threshold [0..255].</summary>
+        public int Threshold { get; set; } = 200;
+
+        /// <summary>Height of extruded boxes.</summary>
+        public double Height { get; set; } = 1.0;
+
+        /// <summary>Granularity of the image in pixels.</summary>
+        public int Granularity { get; set; } = 1;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+            var uri = sdf.FindElement("uri");
+            if (uri?.Value != null) Uri = uri.Value.GetAsString();
+            var scale = sdf.FindElement("scale");
+            if (scale?.Value != null) Scale = scale.Value.DoubleValue;
+            var threshold = sdf.FindElement("threshold");
+            if (threshold?.Value != null) Threshold = threshold.Value.IntValue;
+            var height = sdf.FindElement("height");
+            if (height?.Value != null) Height = height.Value.DoubleValue;
+            var granularity = sdf.FindElement("granularity");
+            if (granularity?.Value != null) Granularity = granularity.Value.IntValue;
             return errors;
         }
     }

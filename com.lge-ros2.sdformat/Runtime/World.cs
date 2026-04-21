@@ -64,6 +64,18 @@ namespace SDFormat
         /// <summary>Plugins.</summary>
         public List<Plugin> Plugins { get; } = new();
 
+        /// <summary>Include elements (before resolution).</summary>
+        public List<Include> Includes { get; } = new();
+
+        /// <summary>Road elements.</summary>
+        public List<Road> Roads { get; } = new();
+
+        /// <summary>Population elements.</summary>
+        public List<Population> Populations { get; } = new();
+
+        /// <summary>State snapshots.</summary>
+        public List<State> States { get; } = new();
+
         // ---- Model accessors ----
         public int ModelCount => Models.Count;
         public Model? ModelByIndex(int index) =>
@@ -122,7 +134,10 @@ namespace SDFormat
         public void AddPlugin(Plugin plugin) => Plugins.Add(plugin);
 
         /// <summary>Load from an SDF element.</summary>
-        public List<SdfError> Load(Element sdf)
+        public List<SdfError> Load(Element sdf) => Load(sdf, null);
+
+        /// <summary>Load from an SDF element with parser configuration for include resolution.</summary>
+        public List<SdfError> Load(Element sdf, ParserConfig? config)
         {
             var errors = new List<SdfError>();
             Element = sdf;
@@ -269,6 +284,50 @@ namespace SDFormat
                 errors.AddRange(plugin.Load(pluginElem));
                 Plugins.Add(plugin);
                 pluginElem = pluginElem.GetNextElement("plugin");
+            }
+
+            // Roads
+            var roadElem = sdf.FindElement("road");
+            while (roadElem != null)
+            {
+                var road = new Road();
+                errors.AddRange(road.Load(roadElem));
+                Roads.Add(road);
+                roadElem = roadElem.GetNextElement("road");
+            }
+
+            // Populations
+            var popElem = sdf.FindElement("population");
+            while (popElem != null)
+            {
+                var pop = new Population();
+                errors.AddRange(pop.Load(popElem));
+                Populations.Add(pop);
+                popElem = popElem.GetNextElement("population");
+            }
+
+            // States
+            var stateElem = sdf.FindElement("state");
+            while (stateElem != null)
+            {
+                var state = new State();
+                errors.AddRange(state.Load(stateElem));
+                States.Add(state);
+                stateElem = stateElem.GetNextElement("state");
+            }
+
+            // Includes
+            var includeElem = sdf.FindElement("include");
+            while (includeElem != null)
+            {
+                var (inc, incErrors) = Include.Load(includeElem);
+                errors.AddRange(incErrors);
+                Includes.Add(inc);
+
+                if (config != null)
+                    errors.AddRange(inc.ResolveAndApply(this, config));
+
+                includeElem = includeElem.GetNextElement("include");
             }
 
             return errors;

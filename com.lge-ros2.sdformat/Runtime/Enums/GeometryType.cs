@@ -33,5 +33,7 @@ namespace SDFormat
         Polyline = 9,
         /// <summary>A cone geometry.</summary>
         Cone = 10,
+        /// <summary>An image-based geometry (extruded from grayscale image).</summary>
+        Image = 11,
     }
 }

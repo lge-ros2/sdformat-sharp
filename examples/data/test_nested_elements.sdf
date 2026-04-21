@@ -1,0 +1,354 @@
+<?xml version="1.0" ?>
+<sdf version="1.12">
+  <world name="nested_test_world">
+
+    <!-- === 1. Deeply nested models (3 levels) === -->
+    <model name="top_robot">
+      <static>false</static>
+      <self_collide>true</self_collide>
+      <pose>1 2 3 0 0 0</pose>
+
+      <link name="base_link">
+        <pose>0 0 0.5 0 0 0</pose>
+        <inertial>
+          <mass>10</mass>
+        </inertial>
+
+        <!-- Visual with full geometry chain -->
+        <visual name="base_visual">
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <box><size>1 1 0.5</size></box>
+          </geometry>
+          <material>
+            <ambient>0.8 0.2 0.1 1</ambient>
+            <diffuse>0.9 0.3 0.2 1</diffuse>
+          </material>
+        </visual>
+
+        <!-- Collision with surface -->
+        <collision name="base_collision">
+          <geometry>
+            <box><size>1 1 0.5</size></box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.8</mu>
+                <mu2>0.6</mu2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>0.01</soft_cfm>
+                <kp>1e9</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+
+        <!-- Sensor nested in link -->
+        <sensor name="base_camera" type="camera">
+          <pose>0.1 0 0.2 0 0 0</pose>
+          <update_rate>30</update_rate>
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+            </image>
+          </camera>
+        </sensor>
+      </link>
+
+      <link name="arm_link">
+        <pose>0.5 0 1.0 0 0 0</pose>
+        <inertial>
+          <mass>5</mass>
+        </inertial>
+        <visual name="arm_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.05</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </visual>
+      </link>
+
+      <!-- Joint connecting base to arm -->
+      <joint name="base_to_arm" type="revolute">
+        <parent>base_link</parent>
+        <child>arm_link</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <limit>
+            <lower>-1.57</lower>
+            <upper>1.57</upper>
+            <effort>100</effort>
+            <velocity>2.0</velocity>
+          </limit>
+        </axis>
+      </joint>
+
+      <!-- Explicit frame -->
+      <frame name="tool_frame" attached_to="arm_link">
+        <pose>0 0 0.5 0 0 0</pose>
+      </frame>
+
+      <!-- ======== NESTED MODEL (level 2) ======== -->
+      <model name="end_effector">
+        <pose relative_to="tool_frame">0 0 0.1 0 0 0</pose>
+
+        <link name="gripper_base">
+          <pose>0 0 0 0 0 0</pose>
+          <inertial>
+            <mass>1.5</mass>
+          </inertial>
+          <visual name="gripper_base_visual">
+            <geometry>
+              <box><size>0.1 0.2 0.05</size></box>
+            </geometry>
+          </visual>
+          <collision name="gripper_base_collision">
+            <geometry>
+              <box><size>0.1 0.2 0.05</size></box>
+            </geometry>
+          </collision>
+        </link>
+
+        <link name="finger_left">
+          <pose>0 -0.08 0.05 0 0 0</pose>
+          <inertial>
+            <mass>0.3</mass>
+          </inertial>
+          <visual name="finger_left_visual">
+            <geometry>
+              <box><size>0.02 0.04 0.1</size></box>
+            </geometry>
+          </visual>
+        </link>
+
+        <link name="finger_right">
+          <pose>0 0.08 0.05 0 0 0</pose>
+          <inertial>
+            <mass>0.3</mass>
+          </inertial>
+          <visual name="finger_right_visual">
+            <geometry>
+              <box><size>0.02 0.04 0.1</size></box>
+            </geometry>
+          </visual>
+        </link>
+
+        <!-- Joints in nested model -->
+        <joint name="left_finger_joint" type="prismatic">
+          <parent>gripper_base</parent>
+          <child>finger_left</child>
+          <axis>
+            <xyz>0 1 0</xyz>
+            <limit>
+              <lower>-0.04</lower>
+              <upper>0</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <joint name="right_finger_joint" type="prismatic">
+          <parent>gripper_base</parent>
+          <child>finger_right</child>
+          <axis>
+            <xyz>0 1 0</xyz>
+            <limit>
+              <lower>0</lower>
+              <upper>0.04</upper>
+            </limit>
+          </axis>
+        </joint>
+
+        <!-- Frame in nested model -->
+        <frame name="grasp_frame" attached_to="gripper_base">
+          <pose>0 0 0.08 0 0 0</pose>
+        </frame>
+
+        <!-- ======== NESTED MODEL (level 3) ======== -->
+        <model name="sensor_module">
+          <pose>0 0 -0.03 0 0 0</pose>
+
+          <link name="sensor_housing">
+            <pose>0 0 0 0 0 0</pose>
+            <inertial>
+              <mass>0.2</mass>
+            </inertial>
+            <visual name="sensor_housing_visual">
+              <geometry>
+                <sphere><radius>0.02</radius></sphere>
+              </geometry>
+            </visual>
+            <sensor name="force_torque_sensor" type="force_torque">
+              <update_rate>1000</update_rate>
+              <force_torque>
+                <frame>child</frame>
+                <measure_direction>child_to_parent</measure_direction>
+              </force_torque>
+            </sensor>
+          </link>
+
+          <frame name="sensor_origin" attached_to="sensor_housing">
+            <pose>0 0 0.01 0 0 0</pose>
+          </frame>
+        </model>
+
+      </model>
+
+      <!-- Joint referencing nested model link using :: syntax -->
+      <joint name="arm_to_effector" type="fixed">
+        <parent>arm_link</parent>
+        <child>end_effector::gripper_base</child>
+      </joint>
+
+      <!-- Gripper referencing nested model links -->
+      <gripper name="main_gripper">
+        <grasp_check>
+          <min_contact_count>2</min_contact_count>
+          <attach_steps>20</attach_steps>
+        </grasp_check>
+        <gripper_link>end_effector::finger_left</gripper_link>
+        <gripper_link>end_effector::finger_right</gripper_link>
+        <palm_link>end_effector::gripper_base</palm_link>
+      </gripper>
+
+    </model>
+
+    <!-- === 2. Model with multiple links, sensors, and frames === -->
+    <model name="sensor_tower">
+      <static>true</static>
+      <pose>5 0 0 0 0 0</pose>
+
+      <link name="tower_base">
+        <visual name="tower_visual">
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </visual>
+        <collision name="tower_collision">
+          <geometry>
+            <cylinder>
+              <radius>0.3</radius>
+              <length>3.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <!-- Multiple sensors in one link -->
+        <sensor name="top_lidar" type="gpu_lidar">
+          <pose>0 0 1.5 0 0 0</pose>
+          <update_rate>10</update_rate>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>640</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.1</min>
+              <max>100</max>
+            </range>
+          </lidar>
+        </sensor>
+
+        <sensor name="imu_sensor" type="imu">
+          <pose>0 0 0.5 0 0 0</pose>
+          <update_rate>200</update_rate>
+          <imu>
+            <angular_velocity>
+              <x><noise type="gaussian"><mean>0</mean><stddev>0.001</stddev></noise></x>
+              <y><noise type="gaussian"><mean>0</mean><stddev>0.001</stddev></noise></y>
+              <z><noise type="gaussian"><mean>0</mean><stddev>0.001</stddev></noise></z>
+            </angular_velocity>
+          </imu>
+        </sensor>
+      </link>
+
+      <!-- Frame with pose relative_to -->
+      <frame name="antenna_mount">
+        <pose relative_to="tower_base">0 0 1.5 0 0 0</pose>
+      </frame>
+    </model>
+
+    <!-- === 3. Nested state with model/link/joint states === -->
+    <state world_name="nested_test_world">
+      <sim_time>25.5</sim_time>
+      <iterations>25500</iterations>
+
+      <model name="top_robot">
+        <pose>1.1 2.2 3.3 0 0 0.1</pose>
+        <scale>1 1 1</scale>
+
+        <link name="base_link">
+          <pose>0 0 0.5 0 0 0</pose>
+          <velocity>0.05 0 0 0 0 0.01</velocity>
+        </link>
+
+        <link name="arm_link">
+          <pose>0.5 0 1.0 0 0.3 0</pose>
+        </link>
+
+        <joint name="base_to_arm">
+          <angle axis="0">0.3</angle>
+        </joint>
+
+        <!-- Nested model state (level 2) -->
+        <model name="end_effector">
+          <pose>0 0 0.1 0 0 0</pose>
+          <scale>1 1 1</scale>
+
+          <link name="gripper_base">
+            <pose>0 0 0 0 0 0</pose>
+          </link>
+
+          <joint name="left_finger_joint">
+            <angle axis="0">-0.02</angle>
+          </joint>
+
+          <joint name="right_finger_joint">
+            <angle axis="0">0.02</angle>
+          </joint>
+
+          <!-- Nested model state (level 3) -->
+          <model name="sensor_module">
+            <pose>0 0 -0.03 0 0 0</pose>
+
+            <link name="sensor_housing">
+              <pose>0 0 0 0 0 0</pose>
+            </link>
+          </model>
+        </model>
+      </model>
+    </state>
+
+    <!-- === 4. Lights at world level (simple nesting test) === -->
+    <light name="sun" type="directional">
+      <pose>0 0 20 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- === 5. Multiple frames at world level === -->
+    <frame name="world_origin">
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+
+    <frame name="spawn_point" attached_to="world_origin">
+      <pose>10 10 0 0 0 1.57</pose>
+    </frame>
+
+  </world>
+</sdf>

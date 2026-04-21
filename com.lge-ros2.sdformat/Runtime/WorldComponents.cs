@@ -221,7 +221,20 @@ namespace SDFormat
         public string EngineType { get; set; } = "ode";
         public double MaxStepSize { get; set; } = 0.001;
         public double RealTimeFactor { get; set; } = 1.0;
+        public double RealTimeUpdateRate { get; set; } = 1000.0;
         public int MaxContacts { get; set; } = 20;
+
+        /// <summary>ODE engine parameters.</summary>
+        public PhysicsOde? Ode { get; set; }
+
+        /// <summary>Bullet engine parameters.</summary>
+        public PhysicsBullet? BulletEngine { get; set; }
+
+        /// <summary>Simbody engine parameters.</summary>
+        public PhysicsSimbody? SimbodyEngine { get; set; }
+
+        /// <summary>DART engine parameters.</summary>
+        public PhysicsDart? DartEngine { get; set; }
 
         public List<SdfError> Load(Element sdf)
         {
@@ -243,8 +256,33 @@ namespace SDFormat
             var rtf = sdf.FindElement("real_time_factor");
             if (rtf?.Value != null) RealTimeFactor = rtf.Value.DoubleValue;
 
+            var rtUpdateRate = sdf.FindElement("real_time_update_rate");
+            if (rtUpdateRate?.Value != null) RealTimeUpdateRate = rtUpdateRate.Value.DoubleValue;
+
             var maxContacts = sdf.FindElement("max_contacts");
             if (maxContacts?.Value != null) MaxContacts = maxContacts.Value.IntValue;
+
+            // Engine-specific params
+            if (sdf.HasElement("ode"))
+            {
+                Ode = new PhysicsOde();
+                errors.AddRange(Ode.Load(sdf.FindElement("ode")!));
+            }
+            if (sdf.HasElement("bullet"))
+            {
+                BulletEngine = new PhysicsBullet();
+                errors.AddRange(BulletEngine.Load(sdf.FindElement("bullet")!));
+            }
+            if (sdf.HasElement("simbody"))
+            {
+                SimbodyEngine = new PhysicsSimbody();
+                errors.AddRange(SimbodyEngine.Load(sdf.FindElement("simbody")!));
+            }
+            if (sdf.HasElement("dart"))
+            {
+                DartEngine = new PhysicsDart();
+                errors.AddRange(DartEngine.Load(sdf.FindElement("dart")!));
+            }
 
             return errors;
         }
@@ -487,6 +525,418 @@ namespace SDFormat
             elem.AddAttribute("name", "string", "", true);
             elem.GetAttribute("name")!.SetFromString(Name);
             return elem;
+        }
+    }
+
+    // ---- Road ----
+
+    /// <summary>A road in the world defined by a width and a series of points.</summary>
+    public class Road : SdfElement
+    {
+        /// <summary>Name of the road.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Width of the road in meters.</summary>
+        public double Width { get; set; } = 1.0;
+
+        /// <summary>Ordered points defining the road center.</summary>
+        public List<Vector3d> Points { get; } = new();
+
+        /// <summary>Material of the road surface.</summary>
+        public Material? RoadMaterial { get; set; }
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var nameAttr = sdf.GetAttribute("name");
+            if (nameAttr != null) Name = nameAttr.GetAsString();
+
+            var widthElem = sdf.FindElement("width");
+            if (widthElem?.Value != null) Width = widthElem.Value.DoubleValue;
+
+            var pointElem = sdf.FindElement("point");
+            while (pointElem != null)
+            {
+                if (pointElem.Value != null)
+                    Points.Add(pointElem.Value.Vector3dValue);
+                pointElem = pointElem.GetNextElement("point");
+            }
+
+            if (sdf.HasElement("material"))
+            {
+                RoadMaterial = new Material();
+                errors.AddRange(RoadMaterial.Load(sdf.FindElement("material")!));
+            }
+
+            return errors;
+        }
+
+        public Element ToElement()
+        {
+            var elem = new Element { Name = "road" };
+            elem.AddAttribute("name", "string", "", true);
+            elem.GetAttribute("name")!.SetFromString(Name);
+            return elem;
+        }
+    }
+
+    // ---- Population ----
+
+    /// <summary>A population element that distributes multiple copies of a model.</summary>
+    public class Population : SdfElement
+    {
+        /// <summary>Name of the population.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Number of models to distribute.</summary>
+        public int ModelCount { get; set; } = 1;
+
+        /// <summary>Distribution type (random, uniform, grid, linear-x, linear-y, linear-z).</summary>
+        public string Distribution { get; set; } = "random";
+
+        /// <summary>URI of the model to populate.</summary>
+        public string ModelUri { get; set; } = string.Empty;
+
+        /// <summary>Model name.</summary>
+        public string ModelName { get; set; } = string.Empty;
+
+        /// <summary>Pose of the population frame.</summary>
+        public Pose3d RawPose { get; set; } = Pose3d.Zero;
+
+        /// <summary>Relative-to frame for the pose.</summary>
+        public string PoseRelativeTo { get; set; } = string.Empty;
+
+        /// <summary>Box region size for distribution.</summary>
+        public Vector3d BoxSize { get; set; } = Vector3d.One;
+
+        /// <summary>Cylinder region radius for distribution.</summary>
+        public double CylinderRadius { get; set; } = 1.0;
+
+        /// <summary>Cylinder region length for distribution.</summary>
+        public double CylinderLength { get; set; } = 1.0;
+
+        /// <summary>Grid row count (for grid distribution).</summary>
+        public int GridRows { get; set; } = 1;
+
+        /// <summary>Grid column count (for grid distribution).</summary>
+        public int GridCols { get; set; } = 1;
+
+        /// <summary>Grid step size.</summary>
+        public Vector3d GridStep { get; set; } = Vector3d.One;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var nameAttr = sdf.GetAttribute("name");
+            if (nameAttr != null) Name = nameAttr.GetAsString();
+
+            var modelCount = sdf.FindElement("model_count");
+            if (modelCount?.Value != null) ModelCount = modelCount.Value.IntValue;
+
+            var distribution = sdf.FindElement("distribution");
+            if (distribution != null)
+            {
+                var type = distribution.FindElement("type");
+                if (type?.Value != null) Distribution = type.Value.GetAsString();
+            }
+
+            var poseElem = sdf.FindElement("pose");
+            if (poseElem?.Value != null)
+            {
+                RawPose = poseElem.Value.Pose3dValue;
+                var relTo = poseElem.GetAttribute("relative_to");
+                if (relTo != null) PoseRelativeTo = relTo.GetAsString();
+            }
+
+            // Model reference
+            if (sdf.HasElement("model"))
+            {
+                var modelElem = sdf.FindElement("model")!;
+                var modelNameAttr = modelElem.GetAttribute("name");
+                if (modelNameAttr != null) ModelName = modelNameAttr.GetAsString();
+            }
+
+            // Box region
+            var box = sdf.FindElement("box");
+            if (box != null)
+            {
+                var size = box.FindElement("size");
+                if (size?.Value != null) BoxSize = size.Value.Vector3dValue;
+            }
+
+            // Cylinder region
+            var cyl = sdf.FindElement("cylinder");
+            if (cyl != null)
+            {
+                var radius = cyl.FindElement("radius");
+                if (radius?.Value != null) CylinderRadius = radius.Value.DoubleValue;
+                var length = cyl.FindElement("length");
+                if (length?.Value != null) CylinderLength = length.Value.DoubleValue;
+            }
+
+            return errors;
+        }
+
+        public Element ToElement()
+        {
+            var elem = new Element { Name = "population" };
+            elem.AddAttribute("name", "string", "", true);
+            elem.GetAttribute("name")!.SetFromString(Name);
+            return elem;
+        }
+    }
+
+    // ---- Gripper ----
+
+    /// <summary>A gripper element within a model.</summary>
+    public class Gripper : SdfElement
+    {
+        /// <summary>Name of the gripper.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Minimum contact count for successful grasp.</summary>
+        public int GraspCheckMinContactCount { get; set; } = 2;
+
+        /// <summary>Number of steps to wait before checking grasp.</summary>
+        public int GraspCheckAttachSteps { get; set; } = 20;
+
+        /// <summary>Gripper link names.</summary>
+        public List<string> GripperLinks { get; } = new();
+
+        /// <summary>Palm link name.</summary>
+        public string PalmLink { get; set; } = string.Empty;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var nameAttr = sdf.GetAttribute("name");
+            if (nameAttr != null) Name = nameAttr.GetAsString();
+
+            // Grasp check
+            var graspCheck = sdf.FindElement("grasp_check");
+            if (graspCheck != null)
+            {
+                var minContacts = graspCheck.FindElement("min_contact_count");
+                if (minContacts?.Value != null) GraspCheckMinContactCount = minContacts.Value.IntValue;
+
+                var attachSteps = graspCheck.FindElement("attach_steps");
+                if (attachSteps?.Value != null) GraspCheckAttachSteps = attachSteps.Value.IntValue;
+            }
+
+            // Gripper links
+            var gripperLinkElem = sdf.FindElement("gripper_link");
+            while (gripperLinkElem != null)
+            {
+                if (gripperLinkElem.Value != null)
+                    GripperLinks.Add(gripperLinkElem.Value.GetAsString());
+                gripperLinkElem = gripperLinkElem.GetNextElement("gripper_link");
+            }
+
+            // Palm link
+            var palmLink = sdf.FindElement("palm_link");
+            if (palmLink?.Value != null) PalmLink = palmLink.Value.GetAsString();
+
+            return errors;
+        }
+
+        public Element ToElement()
+        {
+            var elem = new Element { Name = "gripper" };
+            elem.AddAttribute("name", "string", "", true);
+            elem.GetAttribute("name")!.SetFromString(Name);
+            return elem;
+        }
+    }
+
+    // ---- Physics engine-specific parameters ----
+
+    /// <summary>ODE solver parameters for a physics profile.</summary>
+    public class PhysicsOde : SdfElement
+    {
+        // Solver
+        public string SolverType { get; set; } = "quick";
+        public int SolverIters { get; set; } = 50;
+        public double SolverSor { get; set; } = 1.3;
+        public double SolverPreconIters { get; set; }
+        public double SolverFrictionModel { get; set; }
+        public int SolverIslandThreads { get; set; }
+
+        // Constraints
+        public double ConstraintsCfm { get; set; }
+        public double ConstraintsErp { get; set; } = 0.2;
+        public double ConstraintsContactMaxCorrectingVel { get; set; } = 100.0;
+        public double ConstraintsContactSurfaceLayer { get; set; } = 0.001;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var solver = sdf.FindElement("solver");
+            if (solver != null)
+            {
+                var type = solver.FindElement("type");
+                if (type?.Value != null) SolverType = type.Value.GetAsString();
+                var iters = solver.FindElement("iters");
+                if (iters?.Value != null) SolverIters = iters.Value.IntValue;
+                var sor = solver.FindElement("sor");
+                if (sor?.Value != null) SolverSor = sor.Value.DoubleValue;
+                var preconIters = solver.FindElement("precon_iters");
+                if (preconIters?.Value != null) SolverPreconIters = preconIters.Value.DoubleValue;
+            }
+
+            var constraints = sdf.FindElement("constraints");
+            if (constraints != null)
+            {
+                var cfm = constraints.FindElement("cfm");
+                if (cfm?.Value != null) ConstraintsCfm = cfm.Value.DoubleValue;
+                var erp = constraints.FindElement("erp");
+                if (erp?.Value != null) ConstraintsErp = erp.Value.DoubleValue;
+                var maxVel = constraints.FindElement("contact_max_correcting_vel");
+                if (maxVel?.Value != null) ConstraintsContactMaxCorrectingVel = maxVel.Value.DoubleValue;
+                var surfLayer = constraints.FindElement("contact_surface_layer");
+                if (surfLayer?.Value != null) ConstraintsContactSurfaceLayer = surfLayer.Value.DoubleValue;
+            }
+
+            return errors;
+        }
+    }
+
+    /// <summary>Bullet solver parameters for a physics profile.</summary>
+    public class PhysicsBullet : SdfElement
+    {
+        // Solver
+        public string SolverType { get; set; } = "sequential_impulse";
+        public int SolverIters { get; set; } = 50;
+        public double SolverSor { get; set; } = 1.3;
+        public double SolverMinStepSize { get; set; } = 0.0001;
+
+        // Constraints
+        public double ConstraintsCfm { get; set; }
+        public double ConstraintsErp { get; set; } = 0.2;
+        public double ConstraintsContactSurfaceLayer { get; set; } = 0.001;
+        public bool ConstraintsSplitImpulse { get; set; } = true;
+        public double ConstraintsSplitImpulsePenetrationThreshold { get; set; } = -0.01;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var solver = sdf.FindElement("solver");
+            if (solver != null)
+            {
+                var type = solver.FindElement("type");
+                if (type?.Value != null) SolverType = type.Value.GetAsString();
+                var iters = solver.FindElement("iters");
+                if (iters?.Value != null) SolverIters = iters.Value.IntValue;
+                var sor = solver.FindElement("sor");
+                if (sor?.Value != null) SolverSor = sor.Value.DoubleValue;
+                var minStep = solver.FindElement("min_step_size");
+                if (minStep?.Value != null) SolverMinStepSize = minStep.Value.DoubleValue;
+            }
+
+            var constraints = sdf.FindElement("constraints");
+            if (constraints != null)
+            {
+                var cfm = constraints.FindElement("cfm");
+                if (cfm?.Value != null) ConstraintsCfm = cfm.Value.DoubleValue;
+                var erp = constraints.FindElement("erp");
+                if (erp?.Value != null) ConstraintsErp = erp.Value.DoubleValue;
+                var surfLayer = constraints.FindElement("contact_surface_layer");
+                if (surfLayer?.Value != null) ConstraintsContactSurfaceLayer = surfLayer.Value.DoubleValue;
+                var splitImpulse = constraints.FindElement("split_impulse");
+                if (splitImpulse?.Value != null) ConstraintsSplitImpulse = splitImpulse.Value.BoolValue;
+                var splitThresh = constraints.FindElement("split_impulse_penetration_threshold");
+                if (splitThresh?.Value != null) ConstraintsSplitImpulsePenetrationThreshold = splitThresh.Value.DoubleValue;
+            }
+
+            return errors;
+        }
+    }
+
+    /// <summary>Simbody engine parameters for a physics profile.</summary>
+    public class PhysicsSimbody : SdfElement
+    {
+        public double Accuracy { get; set; } = 0.001;
+        public double MaxTransientVelocity { get; set; } = 0.01;
+
+        // Contact parameters
+        public double ContactStiffness { get; set; } = 1e8;
+        public double ContactDissipation { get; set; } = 100;
+        public double ContactPlasticCoefRestitution { get; set; } = 0.5;
+        public double ContactPlasticImpactVelocity { get; set; } = 0.5;
+        public double ContactStaticFriction { get; set; } = 0.9;
+        public double ContactDynamicFriction { get; set; } = 0.9;
+        public double ContactViscousFriction { get; set; }
+        public double ContactOverrideImpactCaptureVelocity { get; set; } = 0.001;
+        public double ContactOverrideStictionTransitionVelocity { get; set; } = 0.001;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var accuracy = sdf.FindElement("accuracy");
+            if (accuracy?.Value != null) Accuracy = accuracy.Value.DoubleValue;
+            var maxTransient = sdf.FindElement("max_transient_velocity");
+            if (maxTransient?.Value != null) MaxTransientVelocity = maxTransient.Value.DoubleValue;
+
+            var contact = sdf.FindElement("contact");
+            if (contact != null)
+            {
+                var stiffness = contact.FindElement("stiffness");
+                if (stiffness?.Value != null) ContactStiffness = stiffness.Value.DoubleValue;
+                var dissipation = contact.FindElement("dissipation");
+                if (dissipation?.Value != null) ContactDissipation = dissipation.Value.DoubleValue;
+                var plasticCoef = contact.FindElement("plastic_coef_restitution");
+                if (plasticCoef?.Value != null) ContactPlasticCoefRestitution = plasticCoef.Value.DoubleValue;
+                var plasticVel = contact.FindElement("plastic_impact_velocity");
+                if (plasticVel?.Value != null) ContactPlasticImpactVelocity = plasticVel.Value.DoubleValue;
+                var staticFriction = contact.FindElement("static_friction");
+                if (staticFriction?.Value != null) ContactStaticFriction = staticFriction.Value.DoubleValue;
+                var dynamicFriction = contact.FindElement("dynamic_friction");
+                if (dynamicFriction?.Value != null) ContactDynamicFriction = dynamicFriction.Value.DoubleValue;
+                var viscousFriction = contact.FindElement("viscous_friction");
+                if (viscousFriction?.Value != null) ContactViscousFriction = viscousFriction.Value.DoubleValue;
+                var overrideCapture = contact.FindElement("override_impact_capture_velocity");
+                if (overrideCapture?.Value != null) ContactOverrideImpactCaptureVelocity = overrideCapture.Value.DoubleValue;
+                var overrideStiction = contact.FindElement("override_stiction_transition_velocity");
+                if (overrideStiction?.Value != null) ContactOverrideStictionTransitionVelocity = overrideStiction.Value.DoubleValue;
+            }
+
+            return errors;
+        }
+    }
+
+    /// <summary>DART solver parameters for a physics profile.</summary>
+    public class PhysicsDart : SdfElement
+    {
+        public string Solver { get; set; } = "dantzig";
+        public string CollisionDetector { get; set; } = "fcl";
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var solver = sdf.FindElement("solver");
+            if (solver != null)
+            {
+                var type = solver.FindElement("solver_type");
+                if (type?.Value != null) Solver = type.Value.GetAsString();
+            }
+
+            var collision = sdf.FindElement("collision_detector");
+            if (collision?.Value != null) CollisionDetector = collision.Value.GetAsString();
+
+            return errors;
         }
     }
 }

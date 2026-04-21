@@ -36,6 +36,18 @@ namespace SDFormat
         /// <summary>Thread pitch (deprecated, use ScrewThreadPitch).</summary>
         public double ThreadPitch { get; set; }
 
+        /// <summary>Gearbox ratio (for gearbox joints).</summary>
+        public double GearboxRatio { get; set; }
+
+        /// <summary>Gearbox reference body (for gearbox joints).</summary>
+        public string GearboxReferenceBody { get; set; } = string.Empty;
+
+        /// <summary>Whether to provide feedback for this joint.</summary>
+        public bool ProvideFeedback { get; set; }
+
+        /// <summary>Physics engine-specific parameters for this joint.</summary>
+        public JointPhysics? PhysicsSettings { get; set; }
+
         /// <summary>Sensors attached to this joint.</summary>
         public List<Sensor> Sensors { get; } = new();
 
@@ -155,6 +167,23 @@ namespace SDFormat
             var threadPitch = sdf.FindElement("thread_pitch");
             if (threadPitch?.Value != null) ThreadPitch = threadPitch.Value.DoubleValue;
 
+            // Gearbox parameters
+            var gearboxRatio = sdf.FindElement("gearbox_ratio");
+            if (gearboxRatio?.Value != null) GearboxRatio = gearboxRatio.Value.DoubleValue;
+            var gearboxRefBody = sdf.FindElement("gearbox_reference_body");
+            if (gearboxRefBody?.Value != null) GearboxReferenceBody = gearboxRefBody.Value.GetAsString();
+
+            // Physics
+            if (sdf.HasElement("physics"))
+            {
+                PhysicsSettings = new JointPhysics();
+                errors.AddRange(PhysicsSettings.Load(sdf.FindElement("physics")!));
+            }
+
+            // Provide feedback (can be under <physics> or standalone)
+            var provideFeedback = sdf.FindElement("provide_feedback");
+            if (provideFeedback?.Value != null) ProvideFeedback = provideFeedback.Value.BoolValue;
+
             return errors;
         }
 
@@ -197,6 +226,115 @@ namespace SDFormat
                 elem.InsertElement(Axis2.ToElement(1));
 
             return elem;
+        }
+    }
+
+    /// <summary>Physics engine-specific parameters for a joint.</summary>
+    public class JointPhysics : SdfElement
+    {
+        /// <summary>Whether to provide feedback.</summary>
+        public bool ProvideFeedback { get; set; }
+
+        // Simbody
+        /// <summary>Whether the joint must be a loop joint (Simbody).</summary>
+        public bool SimbodyMustBeLoopJoint { get; set; }
+
+        // ODE
+        /// <summary>Whether to use CFM damping (ODE).</summary>
+        public bool OdeCfmDamping { get; set; }
+
+        /// <summary>Whether to use implicit spring damper (ODE).</summary>
+        public bool OdeImplicitSpringDamper { get; set; }
+
+        /// <summary>Fudge factor (ODE).</summary>
+        public double OdeFudgeFactor { get; set; }
+
+        /// <summary>CFM value (ODE).</summary>
+        public double OdeCfm { get; set; }
+
+        /// <summary>ERP value (ODE).</summary>
+        public double OdeErp { get; set; } = 0.2;
+
+        /// <summary>Bounce coefficient (ODE).</summary>
+        public double OdeBounce { get; set; }
+
+        /// <summary>Maximum force (ODE).</summary>
+        public double OdeMaxForce { get; set; }
+
+        /// <summary>Velocity (ODE).</summary>
+        public double OdeVelocity { get; set; }
+
+        // ODE limit params
+        /// <summary>Limit CFM (ODE).</summary>
+        public double OdeLimitCfm { get; set; }
+
+        /// <summary>Limit ERP (ODE).</summary>
+        public double OdeLimitErp { get; set; } = 0.2;
+
+        // ODE suspension
+        /// <summary>Suspension CFM (ODE).</summary>
+        public double OdeSuspensionCfm { get; set; }
+
+        /// <summary>Suspension ERP (ODE).</summary>
+        public double OdeSuspensionErp { get; set; } = 0.2;
+
+        public List<SdfError> Load(Element sdf)
+        {
+            var errors = new List<SdfError>();
+            Element = sdf;
+
+            var provideFeedback = sdf.FindElement("provide_feedback");
+            if (provideFeedback?.Value != null) ProvideFeedback = provideFeedback.Value.BoolValue;
+
+            // Simbody
+            var simbody = sdf.FindElement("simbody");
+            if (simbody != null)
+            {
+                var mustBeLoop = simbody.FindElement("must_be_loop_joint");
+                if (mustBeLoop?.Value != null) SimbodyMustBeLoopJoint = mustBeLoop.Value.BoolValue;
+            }
+
+            // ODE
+            var ode = sdf.FindElement("ode");
+            if (ode != null)
+            {
+                var cfmDamping = ode.FindElement("cfm_damping");
+                if (cfmDamping?.Value != null) OdeCfmDamping = cfmDamping.Value.BoolValue;
+                var implicitSpring = ode.FindElement("implicit_spring_damper");
+                if (implicitSpring?.Value != null) OdeImplicitSpringDamper = implicitSpring.Value.BoolValue;
+                var fudge = ode.FindElement("fudge_factor");
+                if (fudge?.Value != null) OdeFudgeFactor = fudge.Value.DoubleValue;
+                var cfm = ode.FindElement("cfm");
+                if (cfm?.Value != null) OdeCfm = cfm.Value.DoubleValue;
+                var erp = ode.FindElement("erp");
+                if (erp?.Value != null) OdeErp = erp.Value.DoubleValue;
+                var bounce = ode.FindElement("bounce");
+                if (bounce?.Value != null) OdeBounce = bounce.Value.DoubleValue;
+                var maxForce = ode.FindElement("max_force");
+                if (maxForce?.Value != null) OdeMaxForce = maxForce.Value.DoubleValue;
+                var vel = ode.FindElement("velocity");
+                if (vel?.Value != null) OdeVelocity = vel.Value.DoubleValue;
+
+                var limit = ode.FindElement("limit");
+                if (limit != null)
+                {
+                    var limitCfm = limit.FindElement("cfm");
+                    if (limitCfm?.Value != null) OdeLimitCfm = limitCfm.Value.DoubleValue;
+                    var limitErp = limit.FindElement("erp");
+                    if (limitErp?.Value != null) OdeLimitErp = limitErp.Value.DoubleValue;
+                }
+
+                var suspension = ode.FindElement("suspension");
+                if (suspension != null)
+                {
+                    var susCfm = suspension.FindElement("cfm");
+                    if (susCfm?.Value != null) OdeSuspensionCfm = susCfm.Value.DoubleValue;
+                    var susErp = suspension.FindElement("erp");
+                    if (susErp?.Value != null) OdeSuspensionErp = susErp.Value.DoubleValue;
+                }
+            }
+
+            return errors;
         }
     }
 }
