@@ -43,11 +43,10 @@ namespace SDFormat
             var errors = new List<SdfError>();
             Element = sdf;
 
-            var typeElem = sdf.FindElement("type");
-            if (typeElem?.Value != null)
+            var typeAttr = sdf.GetAttribute("type");
+            if (typeAttr != null)
             {
-                var t = typeElem.Value.GetAsString();
-                Type = t switch
+                Type = typeAttr.GetAsString() switch
                 {
                     "gaussian" => NoiseType.Gaussian,
                     "gaussian_quantized" => NoiseType.GaussianQuantized,
@@ -77,16 +76,14 @@ namespace SDFormat
         public Element ToElement()
         {
             var elem = new Element { Name = "noise" };
-            var typeChild = new Element { Name = "type" };
-            typeChild.AddValue("string", "none", true);
             string typeStr = Type switch
             {
                 NoiseType.Gaussian => "gaussian",
                 NoiseType.GaussianQuantized => "gaussian_quantized",
                 _ => "none"
             };
-            typeChild.Set(typeStr);
-            elem.InsertElement(typeChild);
+            elem.AddAttribute("type", "string", "none", true);
+            elem.GetAttribute("type")!.SetFromString(typeStr);
             return elem;
         }
     }
