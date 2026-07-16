@@ -49,9 +49,9 @@ namespace SDFormat
             var refAlt = sdf.FindElement("reference_altitude");
             if (refAlt?.Value != null) ReferenceAltitude = refAlt.Value.DoubleValue;
 
-            var noise = sdf.FindElement("noise");
-            if (noise != null)
-                errors.AddRange(PressureNoise.Load(noise));
+            var pressure = sdf.FindElement("pressure");
+            if (pressure != null && pressure.HasElement("noise"))
+                errors.AddRange(PressureNoise.Load(pressure.FindElement("noise")!));
 
             return errors;
         }
@@ -67,9 +67,9 @@ namespace SDFormat
             var errors = new List<SdfError>();
             Element = sdf;
 
-            var noise = sdf.FindElement("noise");
-            if (noise != null)
-                errors.AddRange(PressureNoise.Load(noise));
+            var pressure = sdf.FindElement("pressure");
+            if (pressure != null && pressure.HasElement("noise"))
+                errors.AddRange(PressureNoise.Load(pressure.FindElement("noise")!));
 
             return errors;
         }

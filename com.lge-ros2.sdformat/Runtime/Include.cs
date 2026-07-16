@@ -61,9 +61,9 @@ namespace SDFormat
             if (nameElem?.Value != null)
                 inc.Name = nameElem.Value.GetAsString();
 
-            var mergeElem = sdf.FindElement("merge");
-            if (mergeElem?.Value != null)
-                inc.Merge = mergeElem.Value.BoolValue;
+            var mergeAttr = sdf.GetAttribute("merge");
+            if (mergeAttr != null)
+                inc.Merge = mergeAttr.BoolValue;
 
             var staticElem = sdf.FindElement("static");
             if (staticElem?.Value != null)
@@ -113,10 +113,8 @@ namespace SDFormat
 
             if (Merge)
             {
-                var mergeChild = new Element { Name = "merge" };
-                mergeChild.AddValue("bool", "false", false);
-                mergeChild.Set("true");
-                elem.InsertElement(mergeChild);
+                elem.AddAttribute("merge", "bool", "false", false);
+                elem.GetAttribute("merge")!.SetFromString("true");
             }
 
             if (Static.HasValue)

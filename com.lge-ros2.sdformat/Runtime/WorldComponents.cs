@@ -642,6 +642,12 @@ namespace SDFormat
             {
                 var type = distribution.FindElement("type");
                 if (type?.Value != null) Distribution = type.Value.GetAsString();
+                var rows = distribution.FindElement("rows");
+                if (rows?.Value != null) GridRows = rows.Value.IntValue;
+                var cols = distribution.FindElement("cols");
+                if (cols?.Value != null) GridCols = cols.Value.IntValue;
+                var step = distribution.FindElement("step");
+                if (step?.Value != null) GridStep = step.Value.Vector3dValue;
             }
 
             var poseElem = sdf.FindElement("pose");
