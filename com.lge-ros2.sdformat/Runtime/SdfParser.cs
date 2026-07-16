@@ -46,6 +46,8 @@ namespace SDFormat
             }
 
             var rootElement = ConvertXElement(doc.Root, errors);
+            if (rootElement != null)
+                errors.AddRange(Converter.ConvertToLatest(rootElement));
             return (rootElement, errors);
         }
 
