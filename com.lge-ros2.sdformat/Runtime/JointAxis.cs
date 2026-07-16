@@ -67,10 +67,10 @@ namespace SDFormat
         public double SpringStiffness { get; set; }
 
         /// <summary>Lower joint limit (m or rad).</summary>
-        public double Lower { get; set; } = -1e16;
+        public double Lower { get; set; } = double.NegativeInfinity;
 
         /// <summary>Upper joint limit (m or rad).</summary>
-        public double Upper { get; set; } = 1e16;
+        public double Upper { get; set; } = double.PositiveInfinity;
 
         /// <summary>Maximum effort (force or torque).</summary>
         public double Effort { get; set; } = double.PositiveInfinity;
