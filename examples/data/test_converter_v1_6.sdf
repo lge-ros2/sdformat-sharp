@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<!-- SDF 1.6 sample: exercises the descendant_name="pose" rule that renames
+     pose/@frame to pose/@relative_to anywhere in the tree, and the <map>
+     rule that turns joint/axis/use_parent_model_frame=true into
+     axis/xyz/@expressed_in="__model__" (removing the flag element). -->
+<sdf version="1.6">
+  <world name="default">
+    <model name="model">
+      <pose frame="world">0 0 0 0 0 0</pose>
+      <link name="parent"/>
+      <link name="child">
+        <pose frame="joint">0 0 0 0 0 0</pose>
+      </link>
+      <joint name="joint" type="fixed">
+        <parent>parent</parent>
+        <child>child</child>
+        <pose frame="parent">0 0 0 0 0 0</pose>
+      </joint>
+      <joint name="revolute_joint" type="revolute">
+        <parent>parent</parent>
+        <child>child</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <use_parent_model_frame>true</use_parent_model_frame>
+        </axis>
+      </joint>
+    </model>
+  </world>
+</sdf>

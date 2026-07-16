@@ -14,9 +14,10 @@ Console.WriteLine("║  5. Full Parse    – Verify all SDF elements   ║");
 Console.WriteLine("║  6. Gazebosim     – Parse gazebosim SDF files  ║");
 Console.WriteLine("║  7. New Elements  – Test SDF 1.12 additions    ║");
 Console.WriteLine("║  8. Nested Elems  – Test nested structures      ║");
+Console.WriteLine("║  9. Version Conv. – Test SDF 1.4->1.12 converter║");
 Console.WriteLine("║  0. Run all                                   ║");
 Console.WriteLine("╚═══════════════════════════════════════════════╝");
-Console.Write("\nSelect example [0-8]: ");
+Console.Write("\nSelect example [0-9]: ");
 
 var input = args.Length > 0 ? args[0] : Console.ReadLine()?.Trim();
 var dataDir = Path.Combine(AppContext.BaseDirectory, "data");
@@ -32,6 +33,7 @@ switch (input)
     case "6": Example6_ParseGazebosimSdf.Run(); break;
     case "7": Example7_TestNewElements.Run(); break;
     case "8": Example8_TestNestedElements.Run(); break;
+    case "9": Example9_TestVersionConverter.Run(); break;
     default:
         Example1_ParseWorld.Run(worldSdf);
         Console.WriteLine();
@@ -48,5 +50,7 @@ switch (input)
         Example7_TestNewElements.Run();
         Console.WriteLine();
         Example8_TestNestedElements.Run();
+        Console.WriteLine();
+        Example9_TestVersionConverter.Run();
         break;
 }

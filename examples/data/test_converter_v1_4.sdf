@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!-- SDF 1.4 sample: exercises the <add> (use_parent_model_frame) and
+     <rename> (actor static attribute -> element) conversion rules. -->
+<sdf version="1.4">
+  <world name="default">
+    <model name="arm">
+      <joint name="shoulder" type="revolute">
+        <parent>base</parent>
+        <child>upper_arm</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+        <axis2>
+          <xyz>1 0 0</xyz>
+        </axis2>
+      </joint>
+    </model>
+    <actor name="greeter" static="true">
+      <link name="link"/>
+    </actor>
+  </world>
+</sdf>

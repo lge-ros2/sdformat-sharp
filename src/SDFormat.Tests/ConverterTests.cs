@@ -310,6 +310,161 @@ namespace SDFormat.Tests
         }
 
         [Fact]
+        public void RemoveEmpty_InertialPoseRelativeTo_17_to_18()
+        {
+            var root = Parse(@"
+<sdf version='1.7'>
+  <world name='default'>
+    <model name='m'>
+      <link name='l'>
+        <inertial>
+          <pose relative_to=''>0 0 0 0 0 0</pose>
+          <mass>1.0</mass>
+        </inertial>
+      </link>
+    </model>
+  </world>
+</sdf>");
+            Converter.ConvertToLatest(root);
+
+            var inertial = root.FindElement("world")!.FindElement("model")!.FindElement("link")!.FindElement("inertial")!;
+            var pose = inertial.FindElement("pose")!;
+            Assert.Null(pose.GetAttribute("relative_to"));
+        }
+
+        [Fact]
+        public void RemoveEmpty_KeepsNonEmptyRelativeTo_17_to_18()
+        {
+            var root = Parse(@"
+<sdf version='1.7'>
+  <world name='default'>
+    <model name='m'>
+      <link name='l'>
+        <inertial>
+          <pose relative_to='some_frame'>0 0 0 0 0 0</pose>
+          <mass>1.0</mass>
+        </inertial>
+      </link>
+    </model>
+  </world>
+</sdf>");
+            Converter.ConvertToLatest(root);
+
+            var inertial = root.FindElement("world")!.FindElement("model")!.FindElement("link")!.FindElement("inertial")!;
+            var pose = inertial.FindElement("pose")!;
+            Assert.Equal("some_frame", pose.GetAttribute("relative_to")!.GetAsString());
+        }
+
+        [Fact]
+        public void Unflatten_JointAxisSensorCameraGripper_17_to_18()
+        {
+            // Mirrors upstream Converter_TEST.cc World_17_to_18's second fixture:
+            // exercises joint parent/child prefix stripping, axis/axis2 xyz
+            // expressed_in, joint/sensor/pose and nested sensor/camera/pose
+            // relative_to stripping, link/sensor/camera/pose stripping, and
+            // both the with-prefix and without-prefix <gripper> cases.
+            var root = Parse(@"
+<sdf version='1.7'>
+  <world name='default'>
+    <model name='ParentModel'>
+      <frame name='ChildModel::__model__' attached_to='ChildModel::L1'>
+        <pose relative_to='__model__'>1 0 1 0 0 0</pose>
+      </frame>
+      <frame name='ChildModel::NewFrame' attached_to='ChildModel::L1'>
+        <pose relative_to='ChildModel::Something'>1 0 1 0 0 0</pose>
+      </frame>
+      <link name='ChildModel::L1'>
+        <pose relative_to='ChildModel::__model__'>0 1 0 0 0 0</pose>
+        <sensor name='s1'>
+          <camera name='c1' type='camera'>
+            <pose relative_to='ChildModel::__model__'>0 0 1 0 0 0</pose>
+          </camera>
+        </sensor>
+      </link>
+      <link name='ChildModel::L2'>
+        <pose relative_to='ChildModel::__model__'>0 0 0 0 0 0</pose>
+      </link>
+      <joint name='ChildModel::J1' type='revolute'>
+        <parent>ChildModel::L1</parent>
+        <child>ChildModel::L2</child>
+      </joint>
+      <joint name='ChildModel::J2' type='revolute'>
+        <pose relative_to='ChildModel::__model__'>0 0 0 0 0 0</pose>
+        <parent>ChildModel::L1</parent>
+        <child>ChildModel::L2</child>
+        <axis>
+          <xyz expressed_in='ChildModel::NewFrame'>0 0 1</xyz>
+        </axis>
+        <axis2>
+          <xyz expressed_in='ChildModel::NewFrame'>0 0 1</xyz>
+        </axis2>
+        <sensor name='camera' type='camera'>
+          <pose relative_to='ChildModel::NewFrame'>1 0 0 0 0 0</pose>
+          <camera name='c2'>
+            <pose relative_to='ChildModel::NewFrame'>0 0 1 0 0 0</pose>
+          </camera>
+        </sensor>
+      </joint>
+      <gripper name='gripper'>
+        <gripper_link>ChildModel::L1</gripper_link>
+        <palm_link>ChildModel::L2</palm_link>
+      </gripper>
+      <gripper name='ChildModel::gripper2'>
+        <gripper_link>ChildModel::L1</gripper_link>
+        <palm_link>ChildModel::L2</palm_link>
+      </gripper>
+    </model>
+  </world>
+</sdf>");
+            Converter.ConvertToLatest(root);
+
+            var parent = root.FindElement("world")!.FindElement("model")!;
+            Assert.Equal("ParentModel", parent.GetAttribute("name")!.GetAsString());
+
+            var childModel = parent.FindElement("model")!;
+            Assert.Equal("ChildModel", childModel.GetAttribute("name")!.GetAsString());
+            Assert.Equal("L1", childModel.GetAttribute("canonical_link")!.GetAsString());
+            Assert.Equal("__model__", childModel.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+
+            var newFrame = childModel.FindElement("frame")!;
+            Assert.Equal("NewFrame", newFrame.GetAttribute("name")!.GetAsString());
+            Assert.Equal("L1", newFrame.GetAttribute("attached_to")!.GetAsString());
+            Assert.Equal("Something", newFrame.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+
+            var l1 = childModel.Children.First(c => c.Name == "link" && c.GetAttribute("name")!.GetAsString() == "L1");
+            Assert.Equal("__model__", l1.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+            var camera1 = l1.FindElement("sensor")!.FindElement("camera")!;
+            Assert.Equal("__model__", camera1.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+
+            var l2 = childModel.Children.First(c => c.Name == "link" && c.GetAttribute("name")!.GetAsString() == "L2");
+            Assert.Equal("__model__", l2.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+
+            var j1 = childModel.Children.First(c => c.Name == "joint" && c.GetAttribute("name")!.GetAsString() == "J1");
+            Assert.Equal("L1", j1.FindElement("parent")!.Value!.GetAsString());
+            Assert.Equal("L2", j1.FindElement("child")!.Value!.GetAsString());
+
+            var j2 = childModel.Children.First(c => c.Name == "joint" && c.GetAttribute("name")!.GetAsString() == "J2");
+            Assert.Equal("__model__", j2.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+            Assert.Equal("L1", j2.FindElement("parent")!.Value!.GetAsString());
+            Assert.Equal("L2", j2.FindElement("child")!.Value!.GetAsString());
+            Assert.Equal("NewFrame", j2.FindElement("axis")!.FindElement("xyz")!.GetAttribute("expressed_in")!.GetAsString());
+            Assert.Equal("NewFrame", j2.FindElement("axis2")!.FindElement("xyz")!.GetAttribute("expressed_in")!.GetAsString());
+
+            var j2Sensor = j2.FindElement("sensor")!;
+            Assert.Equal("NewFrame", j2Sensor.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+            var j2Camera = j2Sensor.FindElement("camera")!;
+            Assert.Equal("NewFrame", j2Camera.FindElement("pose")!.GetAttribute("relative_to")!.GetAsString());
+
+            var gripper1 = childModel.Children.First(c => c.Name == "gripper" && c.GetAttribute("name")!.GetAsString() == "gripper");
+            Assert.Equal("L1", gripper1.FindElement("gripper_link")!.Value!.GetAsString());
+            Assert.Equal("L2", gripper1.FindElement("palm_link")!.Value!.GetAsString());
+
+            var gripper2 = childModel.Children.First(c => c.Name == "gripper" && c.GetAttribute("name")!.GetAsString() == "gripper2");
+            Assert.Equal("L1", gripper2.FindElement("gripper_link")!.Value!.GetAsString());
+            Assert.Equal("L2", gripper2.FindElement("palm_link")!.Value!.GetAsString());
+        }
+
+        [Fact]
         public void RootLoadSdfString_OldVersion_ConvertsAndParses()
         {
             var root = new Root();

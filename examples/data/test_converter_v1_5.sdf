@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!-- SDF 1.5 sample: exercises the <move> rule (physics/gravity and
+     physics/magnetic_field promoted to direct children of <world>) and
+     the <copy>/<move> chain that restructures IMU noise into
+     angular_velocity/linear_acceleration per-axis blocks. -->
+<sdf version="1.5">
+  <world name="default">
+    <physics type="ode">
+      <gravity>1 0 -9.8</gravity>
+      <magnetic_field>1 2 3</magnetic_field>
+    </physics>
+    <model name="box_old_imu_noise">
+      <link name="link">
+        <sensor name="imu_sensor" type="imu">
+          <imu>
+            <noise>
+              <type>gaussian</type>
+              <rate>
+                <mean>0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>7.5e-06</bias_mean>
+                <bias_stddev>8e-07</bias_stddev>
+              </rate>
+              <accel>
+                <mean>0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.1</bias_mean>
+                <bias_stddev>0.001</bias_stddev>
+              </accel>
+            </noise>
+          </imu>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>
