@@ -140,8 +140,20 @@ namespace SDFormat
         public string StringValue => _value;
 
         /// <summary>Get value as double.</summary>
-        public double DoubleValue =>
-            double.TryParse(_value, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : 0.0;
+        public double DoubleValue
+        {
+            get
+            {
+                var trimmed = _value.Trim();
+                if (trimmed.Equals("inf", StringComparison.OrdinalIgnoreCase) ||
+                    trimmed.Equals("+inf", StringComparison.OrdinalIgnoreCase))
+                    return double.PositiveInfinity;
+                if (trimmed.Equals("-inf", StringComparison.OrdinalIgnoreCase))
+                    return double.NegativeInfinity;
+
+                return double.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : 0.0;
+            }
+        }
 
         /// <summary>Get value as int.</summary>
         public int IntValue =>
